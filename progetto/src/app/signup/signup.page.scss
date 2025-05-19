@@ -1,0 +1,87 @@
+.signup-content {
+  --background: #fdf6e3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-frame {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  padding: 20px;
+}
+
+.board-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.2;
+  z-index: 0;
+}
+
+.signup-card {
+  position: relative;
+  z-index: 1;
+  background: #fffdf5;
+  border-radius: 20px;
+  padding: 25px;
+  max-width: 85vh;
+  margin: 0 auto;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.title {
+  color: #ff8800;
+  font-size: 28px;
+  margin-bottom: 20px;
+}
+
+ion-item {
+  --background: transparent;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+ion-button {
+  background: linear-gradient(45deg, #ffa500, #ffcc00);
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  border-radius: 15px;
+}
+
+.goose-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.goose {
+  width: 50px;
+  animation: walk-step 1s infinite;
+}
+
+.goose-1 {
+  animation-delay: 0s;
+}
+
+@keyframes walk-step {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@media screen and (max-width: 600px) {
+  ion-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
