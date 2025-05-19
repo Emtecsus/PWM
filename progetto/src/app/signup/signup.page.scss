@@ -79,3 +79,9 @@ ion-button {
     transform: translateY(-8px);
   }
 }
+@media screen and (max-width: 600px) {
+  ion-col {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+}
