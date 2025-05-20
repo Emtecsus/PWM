@@ -1,12 +1,21 @@
 import { Component } from '@angular/core';
-import { IonHeader, IonToolbar, IonTitle, IonContent } from '@ionic/angular/standalone';
+import { MenuController } from '@ionic/angular';
+import {IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
-  templateUrl: 'home.page.html',
-  styleUrls: ['home.page.scss'],
-  imports: [IonHeader, IonToolbar, IonTitle, IonContent],
+  templateUrl: './home.page.html',
+  styleUrls: ['./home.page.scss'],
+  imports:[IonicModule],
 })
 export class HomePage {
-  constructor() {}
+  constructor(private menu: MenuController) {}
+
+  openMenu() {
+    console.log('Pulsante cliccato!');
+    this.menu.open("barra");          // apre il menu con id "first"
+  }
 }
+
+
+
