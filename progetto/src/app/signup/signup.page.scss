@@ -1,7 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap');
+
+*{
+  font-family: 'Fredoka', sans-serif;
+  font-weight: 500;
+}
+
 .signup-content {
   --background: #fdf6e3;
   display: flex;
   align-items: center;
+
   justify-content: center;
 }
 
