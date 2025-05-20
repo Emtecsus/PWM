@@ -8,3 +8,22 @@
     </ion-toolbar>
   </ion-header>
 </div>
+
+<ion-content fullscreen>
+  <div class="board-container">
+    <div class="grid">
+      <ng-container *ngFor="let row of board">
+        <div
+          *ngFor="let cell of row"
+          class="cell"
+          [style.background-color]="getCellGradientColor(cell)"
+          [class.filled]="cell"
+        >
+          {{ cell || '' }}
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</ion-content>
+
+
