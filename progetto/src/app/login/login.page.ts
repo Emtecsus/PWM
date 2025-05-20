@@ -1,33 +1,54 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { IonButton, IonContent, IonInput, IonItem, IonLabel} from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [
-    IonContent, 
-    CommonModule, 
-    FormsModule,
-    IonItem,
-    IonLabel,
-    IonButton,
-    IonInput]
+  imports: [CommonModule, IonicModule, ReactiveFormsModule]
 })
-export class LoginPage implements OnInit {
+export class LoginPage {
+  form: FormGroup;
 
-  constructor(private router: Router) { }
-  onSignup(){
-    this.router.navigate(['/signup']);
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
+    this.form = this.fb.group({
+      username: ['', Validators.required],
+      password: ['', Validators.required]
+    });
   }
-  onForgotPassword(){
-    this.router.navigate(['/forgot-password']);
-  }
-  ngOnInit() {
-  }
+  onSignup() {
+  this.router.navigateByUrl('/signup');
+}
 
+onForgotPassword() {
+  // Puoi decidere se aprire un alert o navigare in una pagina
+  alert('Funzione non ancora disponibile');
+}
+
+  onSubmit() {
+    if (this.form.invalid) return;
+
+    const { username, password } = this.form.value;
+
+    this.authService.login(username, password).subscribe({
+      next: (res) => {
+        alert('Login avvenuto con successo!');
+        localStorage.setItem('token', res.token);
+        this.router.navigateByUrl('/home');
+      },
+      error: (err) => {
+        console.error(err);
+        alert('Errore durante il login: ' + (err.error?.error || ''));
+      }
+    });
+  }
 }

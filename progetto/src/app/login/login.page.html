@@ -2,33 +2,36 @@
   <div class="board-frame">
     <img src="assets/imgs/Tree_light.jpg" class="board-bg" />
 
-
     <div class="login-card">
       <h1 class="title">DOCTOR GOOSE</h1>
+
       <div class="goose-row">
         <img src="assets/imgs/goose.jpg" class="goose goose-1" />
         <img src="assets/imgs/goose.jpg" class="goose goose-2" />
         <img src="assets/imgs/goose.jpg" class="goose goose-3" />
         <img src="assets/imgs/goose.jpg" class="goose goose-4" />
       </div>
+
+      <form [formGroup]="form" (ngSubmit)="onSubmit()">
         <ion-item>
-          <ion-label style="color:black" position="stacked" >Username</ion-label>
-          <ion-input style="color:black" type="username" placeholder="Username" required></ion-input>
+          <ion-label style="color:black" position="stacked">Username</ion-label>
+          <ion-input style="color:black" type="text" formControlName="username" placeholder="Username"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label style="color:black" position="stacked">Password</ion-label>
-          <ion-input style="color:black" type="password" placeholder="Password" required></ion-input>
+          <ion-input style="color:black" type="password" formControlName="password" placeholder="Password"></ion-input>
         </ion-item>
 
-        <ion-button expand="block" type="submit" [disabled]="true">
+        <ion-button expand="block" type="submit" [disabled]="form.invalid">
           🎲 Accedi al Gioco!
         </ion-button>
-        <div class="login-links">
-            <a (click)="onSignup()">Crea un Account</a>
-            <a (click)="onForgotPassword()">Password Dimenticata?</a>
-        </div>
+      </form>
+
+      <div class="login-links">
+        <a (click)="onSignup()">Crea un Account</a>
+        <a (click)="onForgotPassword()">Password Dimenticata?</a>
+      </div>
     </div>
   </div>
 </ion-content>
-
