@@ -5,13 +5,13 @@ import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/stan
 import { IonicModule } from '@ionic/angular';
 
 @Component({
-  selector: 'app-regole',
-  templateUrl: './regole.page.html',
-  styleUrls: ['./regole.page.scss'],
+  selector: 'app-rules',
+  templateUrl: './rules.page.html',
+  styleUrls: ['./rules.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonicModule]
+  imports: [CommonModule, FormsModule, IonicModule]
 })
-export class RegolePage implements OnInit {
+export class RulesPage implements OnInit {
 
   constructor() { }
 

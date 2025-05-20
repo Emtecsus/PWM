@@ -16,12 +16,20 @@ export const routes: Routes = [
     loadComponent: () => import('./signup/signup.page').then( m => m.SignupPage)
   },
   {
-    path: 'regole',
-    loadComponent: () => import('./regole/regole.page').then( m => m.RegolePage)
+    path: 'rules',
+    loadComponent: () => import('./rules/rules.page').then( m => m.RulesPage)
   },
     {
     path: 'home',
     loadComponent: () => import('./home/home.page').then( m => m.HomePage)
+  },
+  {
+    path: 'account-settings',
+    loadComponent: () => import('./account-settings/account-settings.page').then( m => m.AccountSettingsPage)
+  },
+  {
+    path: 'tutorial',
+    loadComponent: () => import('./tutorial/tutorial.page').then( m => m.TutorialPage)
   },
 ];
 
