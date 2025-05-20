@@ -19,5 +19,9 @@ export const routes: Routes = [
     path: 'regole',
     loadComponent: () => import('./regole/regole.page').then( m => m.RegolePage)
   },
+    {
+    path: 'home',
+    loadComponent: () => import('./home/home.page').then( m => m.HomePage)
+  },
 ];
 
