@@ -47,8 +47,8 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(9, 1fr);
-  grid-template-rows: repeat(9, 1fr);
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
   gap: 8px; // ⬅️ Maggiore spazio tra le celle
   width: 500px; 
   max-width: 90vw;
