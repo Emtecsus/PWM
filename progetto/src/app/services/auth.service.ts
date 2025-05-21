@@ -6,7 +6,7 @@ import { tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private authState = new BehaviorSubject<boolean>(false);
-  private API_URL = 'http://peppeponte.duckdns.org:5000';
+  private API_URL = 'https://api.peppeponte.duckdns.org';
 
   constructor(private http: HttpClient) {
     this.init();
@@ -33,7 +33,8 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    console.log(localStorage.getItem('user_id'));
+    localStorage.removeItem('user_id');
     this.authState.next(false);
   }
 

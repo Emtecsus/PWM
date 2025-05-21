@@ -11,7 +11,7 @@ import {IonicModule } from '@ionic/angular';
 })
 export class HomePage {
   constructor(private menu: MenuController) {}
-   gridSize = 9;
+   gridSize = 8;
   board: number[][] = [];
 
   ngOnInit() {
