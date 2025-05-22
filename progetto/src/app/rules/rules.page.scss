@@ -1,58 +1,114 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
 
-*{
+/* GLOBAL FONT */
+* {
   font-family: 'Fredoka', sans-serif;
   font-weight: 500;
 }
 
-/* From Uiverse.io by Subaashbala */ 
-/* Prior to using this loader, please ensure that you have set a background image or background color, as the text is transparent and not designed with a solid color. */
+/* HOST (sfondo pagina) */
 :host {
   --background: #e4d0b0; /* panna chiaro */
   background-color: var(--background);
   color: #975858; /* testo scuro per contrasto */
 }
 
-.title
-{
-    text-align: center;
-    color: #070000;
-    font-size: 26px;
+/* TITOLI */
+.title {
+  text-align: center;
+  font-family: 'Luckiest Guy', cursive, sans-serif;
+  color: #070000;
+  font-size: 26px;
+}
+.title-centered {
+  display: flex;
+  width: 100%;
+  text-align: center;
+}
+.special {
+  font-family: 'Luckiest Guy', cursive, sans-serif;
+  text-align: center;
+  //color: #ff6f00; // Arancione cartoon
+  font-size: 26px; // Ancora più grande
+  letter-spacing: 6px; // Più spazio tra le lettere
+  //margin: 40px 0 32px 0; // Più spazio sopra e sotto
+  text-shadow:
+    4px 4px 0 #fff8f0,
+    6px 6px 12px #d6d6d6,
+    0 0 1px #ffb300; // Ombra multipla più marcata
+  background: transparent !important;
+  -webkit-text-stroke: 2px #d9534f; // Bordo rosso più spesso*/
+}
+ion-card-title {
+  font-family: 'Luckiest Guy', cursive, sans-serif;
+  color: #070000;
 }
 
+/* LOADER */
 .loader {
   --ANIMATION-DELAY-MULTIPLIER: 70ms;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  height: 100vh;
+  background-color: white; /* oppure trasparente */
+  padding: 0;
+  margin: 0;
   overflow: hidden;
-
-
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background-color: white; /* oppure trasparente */
+}
+.loader span {
+  padding: 0;
+  margin: 0;
+  letter-spacing: -5rem;
+  animation-delay: 0s;
+  transform: translateY(4rem);
+  animation: hideAndSeek 1s alternate infinite cubic-bezier(0.86, 0, 0.07, 1);
+  color: #a67c52; /* colore testo leggermente marrone chiaro */
+}
+.loader .l { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 0); }
+.loader .o { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 1); }
+.loader .a { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 2); }
+.loader .d { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 3); }
+.loader .ispan { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 4); }
+.loader .n { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 5); }
+.loader .g { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 6); }
+.letter { width: fit-content; height: 3rem; }
+.i { margin-inline: 5px; }
+@keyframes hideAndSeek {
+  0% { transform: translateY(4rem); }
+  100% { transform: translateY(0rem); }
+}
+.loader-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+  color: #a67c52; /* colore coerente con loader */
 }
 
-/* Importa un font giocoso da Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
-
-.special {
-  font-family: 'Luckiest Guy', cursive, sans-serif;
-  text-align: center;
-  color: #d9534f;
-  font-size: 1.5rem;
-  letter-spacing: 1px;
-  margin-bottom: 12px;
-  background: transparent !important; // Sfondo trasparente
-  /* oppure per un effetto carta come il resto: */
-  /* background-color: #fdfcf6 !important; */
+/* LISTE E ITEMS */
+.Rules, .ion-padding {
+  width: 100%;
+  max-width: none;
 }
-
-.item {
+.Rules {
+  background-color: #fdfcf6;
+  background-size: 100% 30px, 40px 100%;
+  background-repeat: repeat;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 16px;
+  padding: 24px 32px;
+  border-radius: 12px;
+  margin: 24px auto;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+ion-item.item {
   display: flex;
   flex-direction: column;
   color: #070000;
@@ -71,17 +127,39 @@
   font-family: 'Courier New', Courier, monospace;
   font-size: 16px;
   line-height: 1.6;
-  border: 1px solid #ccc;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  --border-width: 0 !important;
+  --inner-border-width: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
   word-wrap: break-word;
   max-width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
   text-align: left;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
+}
+ion-item.item,
+ion-item.item::part(native),
+ion-item.item .item-native,
+ion-item.item::after {
+  background-color: transparent;
+  --border-width: 0 !important;
+  --inner-border-width: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  --ion-border-color: transparent !important;
+  --ion-item-border-color: transparent !important;
+}
+ion-item.item ion-label {
+  background-color: transparent;
+  padding: 6px 12px;
+  border-radius: 8px;
+  display: block;
+}
+ion-item.item ion-label{
+  font-family: 'Fredoka', sans-serif;
 }
 
+/* CARD */
 ion-card.item {
   display: flex;
   flex-direction: column;
@@ -89,7 +167,7 @@ ion-card.item {
   gap: 6px;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: 16px;
+  padding: 24px 32px;
   min-height: 200px;
   background-color: #fdfcf6;
   background-image: 
@@ -104,95 +182,12 @@ ion-card.item {
   border: 1px solid #ccc;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   word-wrap: break-word;
-  max-width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
   text-align: left;
-  width: 100vw;
-  margin-left: calc(-50vw + 50%);
+  max-width: 100%;
+  margin: 24px auto;
 }
-
-.item.transparent {
-  background-color: transparent;
-  background-image: none;
-}
-
-@media (max-width: 768px) {
-  .item {
-    font-size: 15px;
-    padding: 14px;
-  }
-}
-
-@media (max-width: 480px) {
-  .item {
-    font-size: 14px;
-    padding: 12px;
-  }
-}
-
-
-.loader span {
-  padding: 0;
-  margin: 0;
-  letter-spacing: -5rem;
-  animation-delay: 0s;
-  transform: translateY(4rem);
-  animation: hideAndSeek 1s alternate infinite cubic-bezier(0.86, 0, 0.07, 1);
-  color: #a67c52; /* colore testo leggermente marrone chiaro */
-}
-.loader .l {
-  animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 0);
-}
-.loader .o {
-  animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 1);
-}
-.loader .a {
-  animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 2);
-}
-.loader .d {
-  animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 3);
-}
-.loader .ispan {
-  animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 4);
-}
-.loader .n {
-  animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 5);
-}
-.loader .g {
-  animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 6);
-}
-.letter {
-  width: fit-content;
-  height: 3rem;
-}
-.i {
-  margin-inline: 5px;
-}
-@keyframes hideAndSeek {
-  0% {
-    transform: translateY(4rem);
-  }
-  100% {
-    transform: translateY(0rem);
-  }
-}
-
-.loader-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  color: #a67c52; /* colore coerente con loader */
-}
-
-.title-centered{
-    display: flex;
-    width: 100%;
-    text-align: center;
-}
-
 ion-card {
   margin-bottom: 12px;
   border-radius: 12px;
@@ -201,38 +196,29 @@ ion-card {
   color: #6b1313;
 }
 
-ion-card-title {
-    color: #070000;
-}
-
+/* ICONS */
 ion-icon {
   margin-right: 8px;
   color: #a67c52;
 }
 
+/* SPINNER */
 ion-spinner {
   display: block;
   margin: 100px auto;
 }
 
-.ion-padding{
-    background-color: #e4d0b0;
-    position: relative;
-}
-.Rules, .ion-padding {
-  width: 100%;
-  max-width: none;
-}
-.Rules{
-    --background: #e4d0b0 !important; /* panna chiaro */
-  background-color: var(--background) !important;
-}
-
+/* CONTENUTO */
 ion-content {
   --background: #e4d0b0 !important; /* panna chiaro */
   background-color: var(--background) !important;
 }
+.ion-padding {
+  background-color: #e4d0b0;
+  position: relative;
+}
 
+/* GOOSE ICON */
 .goose {
   position: absolute;
   width: 40px;
@@ -241,10 +227,86 @@ ion-content {
   background-size: contain;
   background-repeat: no-repeat;
 }
-ion-button {
-  background: linear-gradient(45deg, #ffa500, #ffcc00);
-  color: white;
-  font-weight: bold;
+
+/* BOTTONE DI RITORNO ALLA HOME */
+button {
+  display: block;
+  margin: 0 auto;
+  position: relative;
+  padding: 12px 28px;
+  border-radius: 12px;
   font-size: 16px;
-  border-radius: 15px;
+  border: 2px solid #7ec4cf; // marrone chiaro, coerente con la palette
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #ffe29f 0%, #ffaec9 100%);
+  color: #3a3a3a;
+  overflow: hidden;
+  box-shadow: 0 4px 18px 0 rgba(126,196,207,0.15);
+  transition: all 0.2s ease-in;
+}
+button:hover {
+  background: linear-gradient(90deg, #b5ead7 0%, #c7ceea 100%);
+  color: #2d5d7b;
+  border-color: #b5ead7;
+  box-shadow: 0 0 30px 5px rgba(126,196,207,0.25);
+  -webkit-transition: all 0.2s ease-out;
+  -moz-transition: all 0.2s ease-out;
+  transition: all 0.2s ease-out;
+}
+button:hover::before {
+  -webkit-animation: sh02 0.5s 0s linear;
+  -moz-animation: sh02 0.5s 0s linear;
+  animation: sh02 0.5s 0s linear;
+}
+button::before {
+  content: '';
+  display: block;
+  width: 0px;
+  height: 86%;
+  position: absolute;
+  top: 7%;
+  left: 0%;
+  opacity: 0;
+  background: #fff;
+  box-shadow: 0 0 50px 30px #fff;
+  -webkit-transform: skewX(-20deg);
+  -moz-transform: skewX(-20deg);
+  -ms-transform: skewX(-20deg);
+  -o-transform: skewX(-20deg);
+  transform: skewX(-20deg);
+}
+@keyframes sh02 {
+  from {
+    opacity: 0;
+    left: 0%;
+  }
+  50% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    left: 100%;
+  }
+}
+button:active {
+  box-shadow: 0 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.2s ease-in;
+  -moz-transition: box-shadow 0.2s ease-in;
+  transition: box-shadow 0.2s ease-in;
+}
+
+/* RESPONSIVE font-size e padding per .item */
+@media (max-width: 768px) {
+  .item {
+    font-size: 15px;
+    padding: 14px;
+  }
+}
+@media (max-width: 480px) {
+  .item {
+    font-size: 14px;
+    padding: 12px;
+  }
 }
