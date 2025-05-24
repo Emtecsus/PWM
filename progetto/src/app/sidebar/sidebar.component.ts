@@ -21,6 +21,10 @@ export class SidebarComponent {
     this.router.navigateByUrl('/login');
     
   }
+    onRules() {
+    this.router.navigateByUrl('/rules');
+    
+  }
 
 }
 
