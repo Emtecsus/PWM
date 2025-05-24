@@ -130,54 +130,52 @@
   <ion-spinner name="crescent" *ngIf="isLoading" class="ion-margin"></ion-spinner>
 
   <!-- Introduzione -->
+ <ion-list-header>
+    <ion-label class="title">Regole Generali</ion-label>
+  </ion-list-header>
   <ion-list class="Rules">
-    <ion-list-header>
-      <ion-label class = "title">Regole Generali</ion-label>
-    </ion-list-header>
-  <div class="item">  
-    <ion-item>
-      <ion-icon name="dice-outline" slot="start"></ion-icon>
-      <ion-label>I giocatori tirano un dado e avanzano di tante caselle quanto il numero ottenuto.</ion-label>
-    </ion-item>
-    <ion-item>
-      <ion-icon name="flag-outline" slot="start"></ion-icon>
-      <ion-label>Vince chi arriva esattamente alla casella 63.</ion-label>
-    </ion-item>
-    <ion-item>
-      <ion-icon name="return-down-back-outline" slot="start"></ion-icon>
-      <ion-label>Se un giocatore supera la casella 63, torna indietro di tante caselle quante eccede.</ion-label>
-    </ion-item>
-  </div>
-  </ion-list>
+  <ion-item class="item">
+    <ion-label>I giocatori tirano un dado e avanzano di tante caselle quanto il numero ottenuto.</ion-label>
+  </ion-item>
+  <ion-item class="item">
+    <ion-label>Vince chi arriva esattamente alla casella 63.</ion-label>
+  </ion-item>
+  <ion-item class="item">
+    <ion-label>Se un giocatore supera la casella 63, torna indietro di tante caselle quante eccede.</ion-label>
+  </ion-item>
+</ion-list>
 
   <!-- Caselle Speciali -->
-  <ion-list>
+  <ion-list class = "special">
     <ion-list-header>
       <ion-label>Caselle Speciali</ion-label>
     </ion-list-header>
   </ion-list>
 
-  <ion-card>
+  <ion-card class="item">
     <ion-card-header>
-      <ion-card-title>Casella Oca</ion-card-title>
+      <ion-card-title>
+        <ion-icon name="paw-outline" slot="start"></ion-icon>
+        Casella Oca
+      </ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-icon name="flame-outline"></ion-icon>
+      <ion-icon name="paw-outline"></ion-icon>
       Il giocatore avanza di nuovo dello stesso numero di caselle.
     </ion-card-content>
-  </ion-card>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Casella Ponte</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-icon name="walk-outline"></ion-icon>
-      Il giocatore salta alla casella 12.
-    </ion-card-content>
-  </ion-card>
 
-  <ion-card>
+
+  <ion-card-header>
+    <ion-card-title>Casella Ponte</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-icon name="walk-outline"></ion-icon>
+    Il giocatore salta alla casella 12.
+  </ion-card-content>
+
+
+  
     <ion-card-header>
       <ion-card-title>Casella Locanda</ion-card-title>
     </ion-card-header>
@@ -185,9 +183,9 @@
       <ion-icon name="bed-outline"></ion-icon>
       Il giocatore salta un turno.
     </ion-card-content>
-  </ion-card>
+  
 
-  <ion-card>
+  
     <ion-card-header>
       <ion-card-title>Casella Prigione</ion-card-title>
     </ion-card-header>
@@ -195,9 +193,9 @@
       <ion-icon name="lock-closed-outline"></ion-icon>
       Il giocatore salta due turni.
     </ion-card-content>
-  </ion-card>
+  
 
-  <ion-card>
+  
     <ion-card-header>
       <ion-card-title>Casella Morte</ion-card-title>
     </ion-card-header>
@@ -206,8 +204,8 @@
       Il giocatore torna all'inizio.
     </ion-card-content>
   </ion-card>
-<ion-button expand="block" color="secondary" routerLink="/home">Torna alla Home</ion-button>
-<div class="goose" style="top: 350px; left: 150px;"></div>
+<button expand="block" color="secondary" (click)="onHome()">Torna alla Home</button>
+<!--<div class="goose" style="top: 350px; left: 150px;"></div>-->
 </ion-content>
 </ng-template>
 
