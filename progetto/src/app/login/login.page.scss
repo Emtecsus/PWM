@@ -101,6 +101,12 @@ ion-button {
   }
 }
 
+img {
+  user-drag: none;
+  -webkit-user-drag: none; /* Safari */
+  pointer-events: auto;
+}
+
 
 @keyframes walk-step {
   0%, 100% {
