@@ -22,7 +22,7 @@ export class HomePage {
     const size = this.gridSize;
     this.board = Array.from({ length: size }, () => Array(size).fill(null));
 
-    let value = 1;
+    let value = 0;
     let top = 0;
     let bottom = size - 1;
     let left = 0;
