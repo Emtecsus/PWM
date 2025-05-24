@@ -1,0 +1,18 @@
+ion-content.menu-content {
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --padding-start: 0;
+  --padding-end: 0;
+  display: block; // importante: forza il contenuto come blocco normale
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+ion-menu {
+  justify-content: normal-start !important;
+}
+

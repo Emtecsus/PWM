@@ -4,12 +4,14 @@ import { AuthService } from '../services/auth.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { CommonModule, NgIf } from '@angular/common';
+import { ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
   standalone: true,
+  encapsulation: ViewEncapsulation.None,
   imports: [IonicModule, CommonModule, NgIf],
 })
 export class SidebarComponent implements OnInit {

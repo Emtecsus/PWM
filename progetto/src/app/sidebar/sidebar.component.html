@@ -1,15 +1,20 @@
-<ion-menu menuId="home" class="home" contentId="main-content" swipeGesture="false" side="end">
+<ion-menu menuId="home" contentId="main-content" swipeGesture="false" side="end" type="overlay">
   <ion-header>
     <ion-toolbar>
       <ion-title>Menu Content</ion-title>
     </ion-toolbar>
   </ion-header>
-    <ion-button expand="block" (click)="onLogout()" menuClose>Logout</ion-button>
-    <ion-button *ngIf="shouldShow('/rules')" expand="block" (click)="onClick('/rules')" menuClose>Regole</ion-button>
-    <ion-button *ngIf="shouldShow('/home')" expand="block" (click)="onClick('/home')" menuClose>Home</ion-button>
-    <ion-button *ngIf="shouldShow('/home')" expand="block"  menuClose>Setting.</ion-button>
 
+  <ion-content class="menu-content">
+    <div class="menu-button">
+      <ion-button menuClose (click)="onLogout()">Logout</ion-button>
+      <ion-button menuClose *ngIf="shouldShow('/rules')" (click)="onClick('/rules')">Regole</ion-button>
+      <ion-button menuClose *ngIf="shouldShow('/home')" (click)="onClick('/home')">Home</ion-button>
+      <ion-button menuClose *ngIf="shouldShow('/home')">Setting</ion-button>
+    </div>
+  </ion-content>
 </ion-menu>
+
 <!-- Il codice della sidebar è riportato sopra per usarla utilizzare nella pagina <ion-menu-button menu="id della sidebar che si vuole"> si possono fare varie sidebar con vari id a seconda della pagina -->
 <div class="ion-page" id="main-content"></div>
   
