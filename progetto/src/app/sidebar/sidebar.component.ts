@@ -44,8 +44,7 @@ export class SidebarComponent implements OnInit {
   }
 
   async onClick(path: string) {
-    await this.menu.close(this.menuId);
-      this.router.navigateByUrl(path);
+    this.router.navigateByUrl(path);
   }
 
 }
