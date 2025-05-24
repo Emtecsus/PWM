@@ -31,6 +31,10 @@ export class SignupPage {
     });
   }
 
+  onLogin(){
+    this.router.navigateByUrl('/login');
+  }
+
   onSubmit() {
     if (this.form.invalid) return;
     const { username, password } = this.form.value;

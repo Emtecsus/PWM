@@ -5,6 +5,8 @@
   font-weight: 500;
 }
 
+
+
 .signup-content {
   --background: #fdf6e3;
   display: flex;
@@ -66,8 +68,7 @@ ion-button {
 .goose-row {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: 20px;
+  position: relative;
 }
 
 .goose {
@@ -77,6 +78,26 @@ ion-button {
 
 .goose-1 {
   animation-delay: 0s;
+}
+
+.login-links {
+  display: flex;
+  justify-content: center;
+  margin-top: 15px;
+  font-size: 14px;
+
+  a {
+    color: #ff8800;
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s ease;
+
+    &:hover {
+      color: #cc6600;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+  }
 }
 
 @keyframes walk-step {
