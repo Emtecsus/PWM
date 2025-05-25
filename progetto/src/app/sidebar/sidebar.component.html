@@ -4,14 +4,13 @@
       <ion-title>Menu Content</ion-title>
     </ion-toolbar>
   </ion-header>
-
   <ion-content class="menu-content">
     <div class="menu-button">
       <ion-menu-toggle>
-      <ion-button menuClose (click)="onLogout()">Logout</ion-button>
-      <ion-button menuClose *ngIf="shouldShow('/rules')" (click)="onClick('/rules')">Regole</ion-button>
-      <ion-button menuClose *ngIf="shouldShow('/home')" (click)="onClick('/home')">Home</ion-button>
-      <ion-button menuClose *ngIf="shouldShow('/home')">Setting</ion-button>
+      <ion-button  (click)="onLogout()">Logout</ion-button>
+      <ion-button  *ngIf="shouldShow('/rules')" (click)="onClick('/rules')">Regole</ion-button>
+      <ion-button  *ngIf="shouldShow('/home')" (click)="onClick('/home')">Home</ion-button>
+      <ion-button  *ngIf="shouldShow('/home')">Setting</ion-button>
     </ion-menu-toggle>
     </div>
   </ion-content>

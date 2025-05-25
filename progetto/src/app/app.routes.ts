@@ -35,5 +35,9 @@ export const routes: Routes = [
     canActivate: [authGuard], // protetta
     loadComponent: () => import('./tutorial/tutorial.page').then( m => m.TutorialPage)
   },
+  {
+    path: 'game',
+    loadComponent: () => import('./game/game.page').then( m => m.GamePage)
+  },
 ];
 
