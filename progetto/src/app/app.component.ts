@@ -16,9 +16,8 @@ export class AppComponent {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event) => {
-        const current = (event as NavigationEnd).urlAfterRedirects;
-        console.log('✅ Pagina attuale:', current);
-        // Aggiungi qui altra logica globale se ti serve
+        const current = (event as NavigationEnd).urlAfterRedirects; // Se serve c'è la variabile current che contiene
+                                                                    // l'url corrente dopo i redirect
       });
   }
 }
