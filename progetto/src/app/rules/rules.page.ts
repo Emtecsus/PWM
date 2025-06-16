@@ -21,13 +21,18 @@ import {flameOutline,
 export class RulesPage implements OnInit {
 
   isLoading: boolean = true;
-
-  rules = [
+  isFlippedOca       = false;
+  isFlippedPonte     = false;
+  isFlippedLocanda   = false;
+  isFlippedPrigione  = false;
+  isFlippedMorte     = false;
+  
+  /*rules = [
     { title: 'Regola 1', description: 'Descrizione della regola 1.' },
     { title: 'Regola 2', description: 'Descrizione della regola 2.' },
     { title: 'Regola 3', description: 'Descrizione della regola 3.' },
   ];
-
+*/
   constructor(private router: Router) {
     addIcons({'flame-outline': flameOutline,
       'walk-outline': walkOutline,
