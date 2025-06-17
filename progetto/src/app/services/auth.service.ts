@@ -6,7 +6,7 @@ import { tap } from 'rxjs/operators';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private authState = new BehaviorSubject<boolean>(false);
-  private API_URL = 'http://localhost:5000';
+  private API_URL = 'https://api.peppeponte.duckdns.org';
 
   constructor(private http: HttpClient) {
     this.init();
