@@ -26,17 +26,13 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then( m => m.HomePage)
   },
   {
-    path: 'account-settings',
-    canActivate: [authGuard], // protetta
-    loadComponent: () => import('./account-settings/account-settings.page').then( m => m.AccountSettingsPage)
-  },
-  {
     path: 'tutorial',
     canActivate: [authGuard], // protetta
     loadComponent: () => import('./tutorial/tutorial.page').then( m => m.TutorialPage)
   },
   {
     path: 'game',
+    canActivate: [authGuard], // protetta
     loadComponent: () => import('./game/game.page').then( m => m.GamePage)
   },
 ];

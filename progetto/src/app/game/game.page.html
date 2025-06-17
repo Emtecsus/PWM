@@ -18,7 +18,7 @@
           class="cell"
           [style.background-color]="getCellGradientColor(cell)"
           [class.filled]="cell"
-          [attr.id]="cell">
+          [attr.id]="'cell-' + cell">
           {{ cell || '' }}
         </div>
       </ng-container>

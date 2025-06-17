@@ -16,6 +16,26 @@
   </ion-content>
 </ion-menu>
 
+<ion-menu menuId="creategame" contentId="main-content" swipeGesture="false" side="end" type="overlay">
+  <ion-header>
+    <ion-toolbar>
+      <ion-title>Crea Partita</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content class="menu-content">
+    <div class="menu-button">
+      <ion-menu-toggle>
+      <ion-button  (click)="onLogout()">Logout</ion-button>
+      <ion-button  *ngIf="shouldShow('/rules')" (click)="onClick('/rules')">Regole</ion-button>
+      <ion-button  *ngIf="shouldShow('/home')" (click)="onClick('/home')">Home</ion-button>
+      <ion-button  *ngIf="shouldShow('/home')">Setting</ion-button>
+    </ion-menu-toggle>
+    </div>
+  </ion-content>
+</ion-menu>
+
+
+
 <!-- Il codice della sidebar è riportato sopra per usarla utilizzare nella pagina <ion-menu-button menu="id della sidebar che si vuole"> si possono fare varie sidebar con vari id a seconda della pagina -->
 <div class="ion-page" id="main-content"></div>
   
