@@ -9,7 +9,7 @@ import { filter } from 'rxjs/operators';
   selector: 'app-root',
   templateUrl: 'app.component.html',
   standalone: true,
-  imports: [IonApp, IonRouterOutlet, CommonModule],
+  imports: [IonApp, IonRouterOutlet, CommonModule,SidebarComponent],
 })
 export class AppComponent {
   constructor(private router: Router) {

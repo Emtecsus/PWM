@@ -5,7 +5,6 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { CommonModule, NgIf } from '@angular/common';
 import { ViewEncapsulation } from '@angular/core';
-import { ModalController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -20,14 +19,14 @@ export class SidebarComponent implements OnInit {
   @Input() menuId = '';
   currentRoute = '';
   difficulty: string = 'medium';
-  gameTime: number = 30;
+  gameTime: number = 30; // Valore predefinito (minuti)
   isMultiplayer: boolean = false;
+
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private menu: MenuController,
-    private modalCtrl: ModalController
+    private menuCtrl: MenuController,
   ) {}
 
   ngOnInit() {
@@ -54,17 +53,26 @@ export class SidebarComponent implements OnInit {
   }
   
 
-  startGame() {
+   startGame() {
     const settings = {
       difficulty: this.difficulty,
-      time: this.gameTime,
-      multiplayer: this.isMultiplayer
+      gameTime: this.gameTime,
+      isMultiplayer: this.isMultiplayer
     };
-    this.modalCtrl.dismiss(settings);
+
+    console.log('Impostazioni selezionate:', settings);
+    this.closeMenu(); // Chiudi il menu dopo la conferma
+
+    // Aggiungi qui la logica per avviare il gioco (es. navigazione o chiamata API)
   }
 
-  cancel() {
-    this.modalCtrl.dismiss();
+  // Chiudi il menu
+  closeMenu() {
+    this.menuCtrl.close('game-settings');
+  }
+  // Aggiorna il tempo di gioco (es. se usi un range dinamico)
+  updateGameTime(event: any) {
+    this.gameTime = event.detail.value;
   }
 
 }

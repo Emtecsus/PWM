@@ -10,71 +10,59 @@
       <ion-button  (click)="onLogout()">Logout</ion-button>
       <ion-button  *ngIf="shouldShow('/rules')" (click)="onClick('/rules')">Regole</ion-button>
       <ion-button  *ngIf="shouldShow('/home')" (click)="onClick('/home')">Home</ion-button>
-      <ion-button  *ngIf="shouldShow('/home')">Setting</ion-button>
     </ion-menu-toggle>
     </div>
   </ion-content>
 </ion-menu>
 
-<ion-menu menuId="creategame" contentId="main-content" swipeGesture="false" side="end" type="overlay">
   <ion-header>
-    <ion-toolbar>
-      <ion-title>Crea Partita</ion-title>
+    <ion-toolbar color="primary">
+      <ion-title>Impostazioni Partita</ion-title>
     </ion-toolbar>
   </ion-header>
-  <ion-content class="menu-content">
-    <div class="menu-button">
-      <ion-menu-toggle>
-      <ion-button  (click)="onLogout()">Logout</ion-button>
-      <ion-button  *ngIf="shouldShow('/rules')" (click)="onClick('/rules')">Regole</ion-button>
-      <ion-button  *ngIf="shouldShow('/home')" (click)="onClick('/home')">Home</ion-button>
-      <ion-button  *ngIf="shouldShow('/home')">Setting</ion-button>
-    </ion-menu-toggle>
-    </div>
-  </ion-content>
-</ion-menu>
 
+  <ion-content class="ion-padding">
+    <ion-list>
+      <!-- Selezione difficoltà -->
+      <ion-item>
+        <ion-label>Livello Difficoltà</ion-label>
+        <ion-select [(ngModel)]="difficulty" interface="action-sheet">
+          <ion-select-option value="easy">Facile</ion-select-option>
+          <ion-select-option value="medium">Medio</ion-select-option>
+          <ion-select-option value="hard">Difficile</ion-select-option>
+        </ion-select>
+      </ion-item>
 
-<ion-menu menuId="game-settings" contentId="main-content" swipeGesture="false" side="end" type="overlay">
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Impostazioni Partita</ion-title>
-  </ion-toolbar>
-</ion-header>
+      <!-- Range tempo di gioco -->
+      <ion-item>
+        <ion-label>Tempo di Gioco: {{ gameTime }} min</ion-label>
+        <ion-range 
+          [(ngModel)]="gameTime" 
+          min="1" 
+          max="60" 
+          pin="true" 
+          (ionChange)="updateGameTime($event)">
+          <ion-label slot="start">1 min</ion-label>
+          <ion-label slot="end">60 min</ion-label>
+        </ion-range>
+      </ion-item>
 
-<ion-content class="ion-padding">
-  <ion-list>
-    <!-- Esempi di controlli -->
-    <ion-item>
-      <ion-label>Livello Difficoltà</ion-label>
-      <ion-select [(ngModel)]="difficulty">
-        <ion-select-option value="easy">Facile</ion-select-option>
-        <ion-select-option value="medium">Medio</ion-select-option>
-        <ion-select-option value="hard">Difficile</ion-select-option>
-      </ion-select>
-    </ion-item>
+      <!-- Toggle multiplayer -->
+      <ion-item>
+        <ion-label>Modalità Multiplayer</ion-label>
+        <ion-toggle [(ngModel)]="isMultiplayer"></ion-toggle>
+      </ion-item>
+    </ion-list>
 
-    <ion-item>
-      <ion-label>Tempo di Gioco (min)</ion-label>
-      <ion-range [(ngModel)]="gameTime" min="1" max="60" pin="true">
-        <ion-label slot="start">1</ion-label>
-        <ion-label slot="end">60</ion-label>
-      </ion-range>
-    </ion-item>
-
-    <ion-item>
-      <ion-label>Modalità</ion-label>
-      <ion-toggle [(ngModel)]="isMultiplayer"></ion-toggle>
-    </ion-item>
-  </ion-list>
-
-  <div class="ion-text-center ion-padding">
-    <ion-button (click)="startGame()" expand="block" shape="round">
+    <!-- Pulsante conferma -->
+    <ion-button 
+      expand="block" 
+      shape="round" 
+      (click)="startGame()" 
+      class="ion-margin-top">
       CONFERMA
     </ion-button>
-  </div>
-</ion-content>
-</ion-menu>
+  </ion-content>
 
 
 

@@ -11,7 +11,7 @@ import { AuthService } from '../services/auth.service';
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports:[IonicModule,CommonModule,FormsModule, ReactiveFormsModule,],
+  imports:[IonicModule,CommonModule,FormsModule, ReactiveFormsModule],
 })
 export class HomePage {
   showGameSettings = false; // Controlla la visibilità del menu
@@ -21,7 +21,7 @@ export class HomePage {
   players = 1;
   gameTime = 30;
   isMultiplayer = false;
-  constructor(private menu: MenuController,private router: Router,private authService: AuthService,) {}
+  constructor(private menu: MenuController,private router: Router,private authService: AuthService) {}
    gridSize = 8;
   board: number[][] = [];
 
@@ -74,16 +74,11 @@ export class HomePage {
   onRules(){
     this.router.navigateByUrl('/rules');
   }
+  openSettings(){
 
-   openMenu(){
-    this.menu.open('game-settings'); // Apre il side-menu della Home
   }
-
-  startGame(){
-    console.log(this.difficulty, this.gameTime, this.isMultiplayer);
-    // Fai partire il gioco...
-    this.menu.close('game-settings'); // Dopo aver confermato, chiudi il side-menu
-  }
+  startGame() {
+    };
 
 }
 

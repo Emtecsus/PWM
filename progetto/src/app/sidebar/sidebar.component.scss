@@ -13,6 +13,16 @@ ion-content.menu-content {
   padding: 16px;
 }
 ion-menu {
-  justify-content: normal-start !important;
+  --width: 300px;
+  --max-width: 85%;
+}
+
+ion-range {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+ion-toggle {
+  padding-right: 8px;
 }
 
