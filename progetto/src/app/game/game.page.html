@@ -1,15 +1,23 @@
-<div class="ion-page" id="main-content">
-  <ion-header>
-    <ion-toolbar>
-      <ion-buttons slot="end">
-        <ion-menu-button menu="home"></ion-menu-button>
-      </ion-buttons>
-      <ion-title>Menu</ion-title>
-    </ion-toolbar>
-  </ion-header>
-</div>
-
 <ion-content fullscreen>
+
+  <!-- SELEZIONE PEDINA + DADO -->
+  <div class="top-controls">
+    <ion-item>
+      <ion-label>Scegli la tua pedina</ion-label>
+      <ion-select [(ngModel)]="selectedPawn" (ionChange)="savePawnChoice()">
+        <ion-select-option *ngFor="let p of availablePawns" [value]="p">
+          <img [src]="'assets/' + p" style="width: 30px; margin-right: 8px;">
+          {{ p }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <div class="dice-container">
+      <img src="assets/dice.png" alt="Lancia dado" (click)="rollDice()" class="dice-button">
+    </div>
+  </div>
+
+  <!-- TABELLA DI GIOCO -->
   <div class="board-container">
     <div class="grid">
       <ng-container *ngFor="let row of board">
@@ -17,18 +25,20 @@
           *ngFor="let cell of row"
           class="cell"
           [style.background-color]="getCellGradientColor(cell)"
-          [class.filled]="cell"
           [attr.id]="'cell-' + cell">
+
           {{ cell || '' }}
+
+          <!-- PEDINA -->
+          <ng-container *ngFor="let player of players">
+            <img *ngIf="player.position === cell"
+                 [src]="getPawnImage(player.user_id)"
+                 class="pawn"
+                 alt="pedina">
+          </ng-container>
         </div>
       </ng-container>
     </div>
   </div>
+
 </ion-content>
-
-
-
-
-
-
-

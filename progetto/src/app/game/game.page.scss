@@ -54,7 +54,7 @@
   max-width: 90vw;
   aspect-ratio: 1; // mantiene quadrata la griglia
 }
-
+/*
 .cell {
   aspect-ratio: 1;
   border: 1px solid #aaa;
@@ -64,7 +64,7 @@
   font-weight: bold;
   font-size: 14px;
   color: #222;
-}
+}*/
 
 .cell.filled {
   color: white; /* testo bianco sulle caselle colorate */
@@ -76,4 +76,32 @@
   background-image: url('../../assets/imgs/goose_start.png');
   background-size: cover;
   background-position: center;
+}
+.dice-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.dice-button {
+  width: 100px;
+  cursor: pointer;
+}
+
+.cell {
+  position: relative;
+  width: 50px;
+  height: 50px;
+  text-align: center;
+  font-weight: bold;
+  border: 1px solid #ccc;
+}
+
+.pawn {
+  position: absolute;
+  width: 25px;
+  height: 25px;
+  bottom: 2px;
+  left: 2px;
+  z-index: 10;
 }

@@ -6,38 +6,30 @@
       <div class="rules">
         <ion-button (click)="onRules()">Regole</ion-button>
       </div>
-      <div class="settings">
-       <ion-button class="settings" (click)="onRules()">Impostazioni</ion-button>
-      </div>
     </ion-toolbar>
   </ion-header>
-</div>
 
-<ion-content fullscreen>
-  <div class="board-container">
-    <div class="grid">
-      <ng-container *ngFor="let row of board">
-        <div
-          *ngFor="let cell of row"
-          class="cell"
-          [class.filled]="cell"
-          [attr.id]="cell">
-          {{ cell || '' }}
-        </div>
-      </ng-container>
+  <ion-content fullscreen>
+
+    <!-- BOARD -->
+    <div class="board-container">
+      <div class="grid">
+        <ng-container *ngFor="let row of board">
+          <div
+            *ngFor="let cell of row"
+            class="cell"
+            [class.filled]="cell"
+            [attr.id]="cell">
+            {{ cell || '' }}
+          </div>
+        </ng-container>
+      </div>
     </div>
-  </div>
-  
-</ion-content>
-<div class="play">
-    <ion-button (click)="onRules()">Gioca</ion-button>
 
+    <!-- PULSANTE GIOCA -->
+    <div class="play">
+      <ion-button expand="block" (click)="onRules()">Gioca</ion-button>
+    </div>
 
-</div>
-
-
-
-
-
-
-
+  </ion-content>
+</div> <!-- ✅ chiusura corretta dell'ion-page -->

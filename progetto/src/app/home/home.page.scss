@@ -4,6 +4,9 @@
   font-family: 'Fredoka', sans-serif;
   font-weight: 500;
 }
+html, body {
+  height: 100%;
+}
 
 .ion-page{
   z-index: 1;
@@ -36,17 +39,16 @@
 #container a {
   text-decoration: none;
 }
+
 .board-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 27px;
   padding: 16px;
-  height: 100%;
-  //background: black; // sfondo tipo pergamena
-
   background: #2b9348;
+  flex-shrink: 0; // impedisce che venga compresso ma NON forza il 100%
 }
+
 
 .grid {
   display: grid;
@@ -118,12 +120,15 @@ ion-button {
 
 }
 .play {
-  background: #007f5f;
+  background: #2b9348;
   width: 100%;
-  min-height: 60px;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 20px auto;
-  border-radius: 8px; /* Opzionale */
+}
+ion-content {
+  --background: #2b9348; // stesso della board
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
