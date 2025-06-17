@@ -1,21 +1,6 @@
+
+
 <ion-content fullscreen>
-
-  <!-- SELEZIONE PEDINA + DADO -->
-  <div class="top-controls">
-    <ion-item>
-      <ion-label>Scegli la tua pedina</ion-label>
-      <ion-select [(ngModel)]="selectedPawn" (ionChange)="savePawnChoice()">
-        <ion-select-option *ngFor="let p of availablePawns" [value]="p">
-          <img [src]="'assets/' + p" style="width: 30px; margin-right: 8px;">
-          {{ p }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <div class="dice-container">
-      <img src="assets/dice.png" alt="Lancia dado" (click)="rollDice()" class="dice-button">
-    </div>
-  </div>
 
   <!-- TABELLA DI GIOCO -->
   <div class="board-container">
@@ -24,14 +9,12 @@
         <div
           *ngFor="let cell of row"
           class="cell"
-          [style.background-color]="getCellGradientColor(cell)"
+          [class.filled]="cell"
           [attr.id]="'cell-' + cell">
-
           {{ cell || '' }}
-
           <!-- PEDINA -->
           <ng-container *ngFor="let player of players">
-            <img *ngIf="player.position === cell"
+            <img *ngIf="player.position === (cell-1)"
                  [src]="getPawnImage(player.user_id)"
                  class="pawn"
                  alt="pedina">
@@ -40,5 +23,30 @@
       </ng-container>
     </div>
   </div>
+
+  <!-- DADO FLOATING -->
+  <img src="assets/imgs/dice.png"
+       alt="Lancia dado"
+       class="floating-dice"
+       (click)="rollDice()" />
+
+  <!-- Pulsante scelta pedina -->
+  <img src="assets/imgs/goose_musc.png"
+      alt="Scegli pedina"
+      class="floating-pawn"
+      (click)="togglePawnSelector()" />
+
+  <ion-card class="pawn-selector" *ngIf="showPawnSelector">
+      <ion-card-content>
+        <div class="pawn-options">
+          <img *ngFor="let p of availablePawns"
+              [src]="'assets/imgs/' + p"
+              (click)="selectPawn(p)"
+              class="pawn-option"
+              [class.selected]="p === selectedPawn" />
+        </div>
+      </ion-card-content>
+  </ion-card>
+
 
 </ion-content>
