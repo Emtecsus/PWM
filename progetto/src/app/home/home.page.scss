@@ -107,9 +107,9 @@ ion-button {
   position: relative;
 }
 .rules {
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  align-items:end;
+  justify-content:end;
+  text-align:center;
 }
 
 .settings{
@@ -131,4 +131,28 @@ ion-content {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+.game-settings-menu {
+  background: #2b9348;
+  border-radius: 16px;
+  padding: 16px;
+  margin-top: 20px;
+  animation: fadeIn 0.3s ease-out;
+
+  ion-list {
+    background: transparent;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.settings-modal {
+  --width: 90%;
+  --max-width: 500px;
+  --border-radius: 16px;
+  --height: auto;
+  --max-height: 80vh;
 }
