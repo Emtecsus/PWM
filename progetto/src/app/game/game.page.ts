@@ -20,10 +20,23 @@ export class GamePage implements OnInit {
 
   gameId: string = '33a42253-4de9-47bd-a053-f595ba3597e8'; // TODO imposta dinamicamente
   userId: string = localStorage.getItem('token') || '';
-  
+  winnerUsername: string | null = null;
+  gameFinished: boolean = false;
 
   availablePawns = ['goose_musc.png', 'goose_classy1.png', 'goose_magic.png', 'goose_party.png'];
   selectedPawn = 'goose_musc.png';
+
+  showPawnSelector = false;
+
+  selectPawn(pawnName: string) {
+    this.selectedPawn = pawnName;
+    localStorage.setItem('pawn_' + this.userId, pawnName);
+    this.showPawnSelector = false;
+  }
+
+  togglePawnSelector() {
+    this.showPawnSelector = !this.showPawnSelector;
+  }
 
   ngOnInit() {
     console.log(this.userId);
@@ -51,6 +64,7 @@ export class GamePage implements OnInit {
       left++;
     }
   }
+  
 
   getCellGradientColor(value: number | null): string {
     if (!value) return 'transparent';
@@ -64,24 +78,55 @@ export class GamePage implements OnInit {
 
   getPawnImage(userId: string): string {
     const stored = localStorage.getItem('pawn_' + userId);
-    return stored ? 'assets/' + stored : 'assets/imgs/goose_musc.png';
+    return stored ? 'assets/imgs/' + stored : 'assets/imgs/goose_musc.png';
   }
 
-  rollDice() {
-    fetch('https://api.peppeponte.duckdns.org/roll_dice', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: this.userId, game_id: this.gameId })
-    })
-    .then(res => res.json())
-    .then(() => this.updateGameState());
-  }
+  rollDice(userIdOverride?: string) {
+  const userId = userIdOverride || this.userId;
+
+  fetch('https://api.peppeponte.duckdns.org/roll_dice', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: userId, game_id: this.gameId })
+  })
+  .then(res => res.json())
+  .then(() => this.updateGameState());
+}
+
 
   updateGameState() {
-    fetch(`https://api.peppeponte.duckdns.org/game_state/${this.gameId}`)
-      .then(res => res.json())
-      .then(data => {
-        this.players = data.game.players;
-      });
-  }
+  fetch(`https://api.peppeponte.duckdns.org/game_state/${this.gameId}`)
+    .then(res => res.json())
+    .then(data => {
+      const game = data.game;
+      this.players = game.players;
+
+      if (game.status === 'finished') {
+        this.gameFinished = true;
+
+        // Prendi username del vincitore
+        if (game.winner) {
+          fetch(`https://api.peppeponte.duckdns.org/get_username/${game.winner}`)
+            .then(res => res.json())
+            .then(user => {
+              this.winnerUsername = user['Username cercato'];
+            });
+        }
+
+        return; // ⛔ Interrompi il resto della funzione (niente roll per CPU)
+      }
+
+      // Se il gioco non è finito, valuta se è turno di un CPU
+      const currentTurn = game.current_turn;
+      const player = this.players.find(p => p.user_id === currentTurn);
+      const isCpu = player?.is_cpu;
+
+      if (isCpu) {
+        setTimeout(() => this.rollDice(currentTurn), 1000);
+      }
+    });
+}
+
+
+  
 }

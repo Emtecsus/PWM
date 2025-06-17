@@ -39,10 +39,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 27px;
   padding: 16px;
-  height: 100%;
-  background: black; // sfondo tipo pergamena
+  background: #2b9348;
+  flex-shrink: 0; // impedisce che venga compresso ma NON forza il 100%
 }
 
 .grid {
@@ -54,7 +53,6 @@
   max-width: 90vw;
   aspect-ratio: 1; // mantiene quadrata la griglia
 }
-/*
 .cell {
   aspect-ratio: 1;
   border: 1px solid #aaa;
@@ -64,44 +62,109 @@
   font-weight: bold;
   font-size: 14px;
   color: #222;
-}*/
-
+  position: relative;
+  background-color: #007f5f;
+}
 .cell.filled {
   color: white; /* testo bianco sulle caselle colorate */
   font-weight: 700;
 }
-
 #cell-0 {
-  background-color: red !important;
-  background-image: url('../../assets/imgs/goose_start.png');
+  background-color: transparent !important;
   background-size: cover;
   background-position: center;
+  border-color: transparent;
 }
-.dice-container {
-  display: flex;
-  justify-content: center;
-  margin: 10px 0;
+#cell-1 {
+  background-color: transparent !important;
+  background-image: url('../../assets/imgs/goose_start2.png');
+  background-size: cover;
+  background-position: center;
+  color: transparent;
+  background-repeat: no-repeat;
 }
-
-.dice-button {
-  width: 100px;
-  cursor: pointer;
-}
-
-.cell {
-  position: relative;
-  width: 50px;
-  height: 50px;
-  text-align: center;
-  font-weight: bold;
-  border: 1px solid #ccc;
-}
-
 .pawn {
   position: absolute;
-  width: 25px;
-  height: 25px;
+  width: auto;
+  height: 70px;
   bottom: 2px;
   left: 2px;
   z-index: 10;
+}
+.floating-dice {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 64px;
+  height: 64px;
+  cursor: pointer;
+  z-index: 1000;
+
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.floating-dice:hover {
+  transform: scale(1.1);
+}
+.floating-pawn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 56px;
+  height: 56px;
+  background-color: #fff;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  z-index: 1000;
+  transition: transform 0.2s ease;
+}
+
+.floating-pawn:hover {
+  transform: scale(1.1);
+}
+.pawn-selector {
+  position: fixed;
+  bottom: 90px;
+  left: 20px;
+  width: 200px;
+  z-index: 1001;
+  background-color: white;
+}
+
+.pawn-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.pawn-option {
+  width: 48px;
+  height: auto;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  transition: transform 0.2s;
+}
+
+.pawn-option:hover {
+  transform: scale(1.1);
+}
+
+.pawn-option.selected {
+  border-color: #eeef20;
+}
+
+
+ion-content {
+  --background: #2b9348; // stesso della board
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
