@@ -12,9 +12,9 @@ import { Router } from '@angular/router';
   imports: [IonicModule, CommonModule, FormsModule]
 })
 export class GamePage implements OnInit {
-
+  private pollingInterval: any;
   constructor(public router:Router) {}
-
+  
   gridSize = 8;
   board: number[][] = [];
   players: any[] = [];
@@ -40,16 +40,19 @@ export class GamePage implements OnInit {
   }
 
   ngOnInit() {
-    console.log(this.userId);
-    console.log(this.gameId);
     this.generateSpiralBoard();
-    
     const saved = localStorage.getItem('pawn_' + this.userId);
     if (saved) this.selectedPawn = saved;
 
     this.updateGameState();
+    this.startPollingGameState();
   }
 
+  startPollingGameState() {
+    this.pollingInterval = setInterval(() => {
+      this.updateGameState();
+    }, 2000); // ogni 2 secondi
+  }
   generateSpiralBoard() {
     const size = this.gridSize;
     this.board = Array.from({ length: size }, () => Array(size).fill(null));
@@ -127,8 +130,10 @@ export class GamePage implements OnInit {
         setTimeout(() => this.rollDice(currentTurn), 1000);
       }
     });
-}
-
+  }
+  ngOnDestroy() {
+    clearInterval(this.pollingInterval);
+  }
 
   
 }
