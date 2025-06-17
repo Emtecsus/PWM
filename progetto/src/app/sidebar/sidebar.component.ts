@@ -5,6 +5,8 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { CommonModule, NgIf } from '@angular/common';
 import { ViewEncapsulation } from '@angular/core';
+import { ModalController } from '@ionic/angular';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,16 +14,20 @@ import { ViewEncapsulation } from '@angular/core';
   styleUrls: ['./sidebar.component.scss'],
   standalone: true,
   encapsulation: ViewEncapsulation.None,
-  imports: [IonicModule, CommonModule, NgIf],
+  imports: [IonicModule, CommonModule, NgIf,FormsModule],
 })
 export class SidebarComponent implements OnInit {
   @Input() menuId = '';
   currentRoute = '';
+  difficulty: string = 'medium';
+  gameTime: number = 30;
+  isMultiplayer: boolean = false;
 
   constructor(
     private authService: AuthService,
     private router: Router,
-    private menu: MenuController
+    private menu: MenuController,
+    private modalCtrl: ModalController
   ) {}
 
   ngOnInit() {
@@ -45,6 +51,20 @@ export class SidebarComponent implements OnInit {
 
   async onClick(path: string) {
     this.router.navigateByUrl(path);
+  }
+  
+
+  startGame() {
+    const settings = {
+      difficulty: this.difficulty,
+      time: this.gameTime,
+      multiplayer: this.isMultiplayer
+    };
+    this.modalCtrl.dismiss(settings);
+  }
+
+  cancel() {
+    this.modalCtrl.dismiss();
   }
 
 }

@@ -35,6 +35,48 @@
 </ion-menu>
 
 
+<ion-menu menuId="game-settings" contentId="main-content" swipeGesture="false" side="end" type="overlay">
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Impostazioni Partita</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <!-- Esempi di controlli -->
+    <ion-item>
+      <ion-label>Livello Difficoltà</ion-label>
+      <ion-select [(ngModel)]="difficulty">
+        <ion-select-option value="easy">Facile</ion-select-option>
+        <ion-select-option value="medium">Medio</ion-select-option>
+        <ion-select-option value="hard">Difficile</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Tempo di Gioco (min)</ion-label>
+      <ion-range [(ngModel)]="gameTime" min="1" max="60" pin="true">
+        <ion-label slot="start">1</ion-label>
+        <ion-label slot="end">60</ion-label>
+      </ion-range>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Modalità</ion-label>
+      <ion-toggle [(ngModel)]="isMultiplayer"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <div class="ion-text-center ion-padding">
+    <ion-button (click)="startGame()" expand="block" shape="round">
+      CONFERMA
+    </ion-button>
+  </div>
+</ion-content>
+</ion-menu>
+
+
 
 <!-- Il codice della sidebar è riportato sopra per usarla utilizzare nella pagina <ion-menu-button menu="id della sidebar che si vuole"> si possono fare varie sidebar con vari id a seconda della pagina -->
 <div class="ion-page" id="main-content"></div>

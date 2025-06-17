@@ -5,7 +5,9 @@
       <img src="assets/imgs/goose_classy2_inverted.png" alt="Logo inverted" class="logo_inverted" />
       <div class="rules">
         <ion-button (click)="onRules()">Regole</ion-button>
+        <ion-button slot="end" (click)="onLogout()">Esci</ion-button>
       </div>
+      
     </ion-toolbar>
   </ion-header>
 
@@ -28,8 +30,8 @@
 
     <!-- PULSANTE GIOCA -->
     <div class="play">
-      <ion-button expand="block" (click)="onRules()">Gioca</ion-button>
+      <ion-button expand="block" (click)="openMenu()">GIOCA</ion-button>
     </div>
-
   </ion-content>
 </div> <!-- ✅ chiusura corretta dell'ion-page -->
+
