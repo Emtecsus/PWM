@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { MenuController } from '@ionic/angular';
 import {IonicModule } from '@ionic/angular';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +11,7 @@ import {IonicModule } from '@ionic/angular';
   imports:[IonicModule,CommonModule],
 })
 export class HomePage {
-  constructor(private menu: MenuController) {}
+  constructor(private menu: MenuController,private router: Router) {}
    gridSize = 8;
   board: number[][] = [];
 
@@ -55,18 +56,9 @@ export class HomePage {
     }
     
   }
-  getCellGradientColor(value: number | null): string {
-  if (!value) return 'transparent';
 
-  // Hue: verde 120°, rosso 0°
-  // Calcolo inverso per andare da verde (120) a rosso (0)
-  const hue = 120 - ((value - 1) / 62) * 120; 
-
-  // Saturation and lightness fissi per un bel colore pieno
-  const saturation = 70;
-  const lightness = 50;
-
-  return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+  onRules(){
+    this.router.navigateByUrl('/rules');
   }
 
 }

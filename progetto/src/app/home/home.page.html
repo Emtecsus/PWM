@@ -1,10 +1,14 @@
 <div class="ion-page" id="main-content">
   <ion-header>
     <ion-toolbar>
-      <ion-buttons slot="end">
-        <ion-menu-button menu="home"></ion-menu-button>
-      </ion-buttons>
-      <ion-title>Menu</ion-title>
+      <img src="assets/imgs/goose_classy2.png" alt="Logo" class="logo" />
+      <img src="assets/imgs/goose_classy2_inverted.png" alt="Logo inverted" class="logo_inverted" />
+      <div class="rules">
+        <ion-button (click)="onRules()">Regole</ion-button>
+      </div>
+      <div class="settings">
+       <ion-button class="settings" (click)="onRules()">Impostazioni</ion-button>
+      </div>
     </ion-toolbar>
   </ion-header>
 </div>
@@ -16,7 +20,6 @@
         <div
           *ngFor="let cell of row"
           class="cell"
-          [style.background-color]="getCellGradientColor(cell)"
           [class.filled]="cell"
           [attr.id]="cell">
           {{ cell || '' }}
@@ -24,7 +27,13 @@
       </ng-container>
     </div>
   </div>
+  
 </ion-content>
+<div class="play">
+    <ion-button (click)="onRules()">Gioca</ion-button>
+
+
+</div>
 
 
 
