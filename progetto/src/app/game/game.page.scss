@@ -160,11 +160,39 @@
 .pawn-option.selected {
   border-color: #eeef20;
 }
-
+.logo {
+  width: 5vh;
+  height: auto;
+  float: left;
+}
+.logo_inverted {
+  width: 5vh;
+  height: auto;
+  float: right;
+}
 
 ion-content {
   --background: #2b9348; // stesso della board
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+ion-toolbar {
+  --background: #AAcc00;
+  --border-radius: 0px;
+  --box-shadow: none;
+  display: flex;
+}
+ion-button {
+  --background: #eeef20;
+  --color: black;
+  --border-radius: 8px;
+  --box-shadow: none;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  display:inline-block;
+  margin-top: 2vh;
+  width: auto;
+   z-index: 10;
+  position: relative;
 }

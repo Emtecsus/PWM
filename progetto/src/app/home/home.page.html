@@ -5,6 +5,7 @@
       <img src="assets/imgs/goose_classy2_inverted.png" alt="Logo inverted" class="logo_inverted" />
       <div class="rules">
         <ion-button (click)="onRules()">Regole</ion-button>
+        <ion-button slot="end" [disabled]="canJoinOrCreate" *ngIf="!canJoinOrCreate" (click)="router.navigateByUrl('/game')">Riprendi la partita</ion-button>
         <ion-button slot="end" (click)="onLogout()">Esci</ion-button>
       </div>
     </ion-toolbar>
@@ -12,49 +13,98 @@
 
   <ion-content fullscreen>
 
-    <!-- BOARD -->
-    <div class="board-container">
-      <div class="grid">
-        <ng-container *ngFor="let row of board">
-          <div
-            *ngFor="let cell of row"
-            class="cell"
-            [class.filled]="cell"
-            [attr.id]="cell">
-            {{ cell || '' }}
-          </div>
-        </ng-container>
+    <!-- CONTENITORE RESPONSIVE -->
+    <div class="main-content">
+      <!-- TABELLA GIOCHI -->
+      <div class="game-list full-height">
+        <h3>Partite disponibili</h3>
+        <ion-list *ngIf="availableGames.length > 0">
+          <ion-item *ngFor="let game of availableGames">
+            <ion-label>
+              Creatore: {{ game.creator }} ({{ game.current_players }}/{{ game.max_players }})
+            </ion-label>
+            <ion-button
+              size="small"
+              color="success"
+              [disabled]="!canJoinOrCreate"
+              (click)="joinGame(game.game_id)">
+              Entra
+            </ion-button>
+          </ion-item>
+        </ion-list>
+        <ion-text color="medium" *ngIf="availableGames.length === 0">
+          Nessuna partita disponibile al momento.
+        </ion-text>
+      </div>
+
+      <!-- TABELLA DI GIOCO -->
+      <div class="board-container full-height">
+        <div class="grid">
+          <ng-container *ngFor="let row of board">
+            <div
+              *ngFor="let cell of row"
+              class="cell"
+              [class.filled]="cell"
+              [attr.id]="cell">
+              {{ cell || '' }}
+            </div>
+          </ng-container>
+        </div>
       </div>
     </div>
 
     <!-- PULSANTE GIOCA -->
     <div class="play">
-      <ion-button expand="block" (click)="openSettings()">GIOCA
-        
-        <ion-header>
-    <ion-toolbar color="primary">
-      <ion-title>Impostazioni Partita</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-content class="ion-padding">
-    <ion-list>
-      <ion-item>
-        <ion-label>Modalità Multiplayer</ion-label>
-      </ion-item>
-    </ion-list>
-
-    <!-- Pulsante conferma -->
-    <ion-button 
-      expand="block" 
-      shape="round" 
-      (click)="startGame()" 
-      class="ion-margin-top">
-      CONFERMA
-    </ion-button>
-  </ion-content>
-      </ion-button>
+      <ion-button expand="block" [disabled]="!canJoinOrCreate" (click)="settingsOpen = true">GIOCA</ion-button>
     </div>
-  </ion-content>
-</div> <!-- ✅ chiusura corretta dell'ion-page -->
 
+    <ion-card>
+      <ion-text class="errore" color="danger" *ngIf="!canJoinOrCreate">
+        Hai già una partita in corso. Termina prima quella.
+      </ion-text>
+    </ion-card>
+
+    <!-- MODALE IMPOSTAZIONI -->
+    <ion-modal
+      [isOpen]="settingsOpen"
+      (didDismiss)="settingsOpen = false"
+      [canDismiss]="true"
+      class="settings-modal">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar color="primary">
+            <ion-title>Impostazioni Partita</ion-title>
+          </ion-toolbar>
+        </ion-header>
+
+        <ion-content class="ion-padding">
+          <ion-list>
+            <ion-item>
+              <ion-label position="stacked">Numero massimo di giocatori</ion-label>
+              <ion-input type="number" [(ngModel)]="maxPlayers" placeholder="Default: 4"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Numero massimo di caselle</ion-label>
+              <ion-input type="number" [(ngModel)]="maxCells" placeholder="Default: 63"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label position="stacked">Numero di caselle speciali</ion-label>
+              <ion-input type="number" [(ngModel)]="numCells" placeholder="Default: 5"></ion-input>
+            </ion-item>
+
+            <ion-item>
+              <ion-label>Contro CPU</ion-label>
+              <ion-toggle [(ngModel)]="vsCpu"></ion-toggle>
+            </ion-item>
+          </ion-list>
+
+          <ion-button expand="block" shape="round" (click)="startGame()" class="ion-margin-top">
+            CONFERMA
+          </ion-button>
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+  </ion-content>
+</div>

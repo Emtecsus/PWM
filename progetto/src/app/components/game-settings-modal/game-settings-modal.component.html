@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Impostazioni Partita</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancel()">Chiudi</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Numero massimo di giocatori</ion-label>
+      <ion-input type="number" [(ngModel)]="maxPlayers" placeholder="Default: 4"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Numero massimo di caselle</ion-label>
+      <ion-input type="number" [(ngModel)]="maxCells" placeholder="Default: 63"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Numero di caselle speciali</ion-label>
+      <ion-input type="number" [(ngModel)]="numCells" placeholder="Default: 5"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Contro CPU</ion-label>
+      <ion-toggle [(ngModel)]="vsCpu"></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" shape="round" (click)="confirm()" class="ion-margin-top">
+    CONFERMA
+  </ion-button>
+</ion-content>

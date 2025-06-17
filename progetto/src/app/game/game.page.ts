@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-game',
@@ -12,13 +13,13 @@ import { FormsModule } from '@angular/forms';
 })
 export class GamePage implements OnInit {
 
-  constructor() {}
+  constructor(public router:Router) {}
 
   gridSize = 8;
   board: number[][] = [];
   players: any[] = [];
 
-  gameId: string = '33a42253-4de9-47bd-a053-f595ba3597e8'; // TODO imposta dinamicamente
+  gameId: string = localStorage.getItem('game_id') || ''; // TODO imposta dinamicamente
   userId: string = localStorage.getItem('token') || '';
   winnerUsername: string | null = null;
   gameFinished: boolean = false;
@@ -40,6 +41,7 @@ export class GamePage implements OnInit {
 
   ngOnInit() {
     console.log(this.userId);
+    console.log(this.gameId);
     this.generateSpiralBoard();
     
     const saved = localStorage.getItem('pawn_' + this.userId);

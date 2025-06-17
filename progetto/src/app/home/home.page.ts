@@ -5,39 +5,49 @@ import {IonicModule } from '@ionic/angular';
 import { Router } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
+import { GameService } from '../services/game.service';
+import { ModalController } from '@ionic/angular';
+import { GameSettingsModalComponent } from '../components/game-settings-modal/game-settings-modal.component';
 
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
-  imports:[IonicModule,CommonModule,FormsModule, ReactiveFormsModule],
+  imports:[IonicModule,CommonModule,FormsModule, ReactiveFormsModule,],
 })
 export class HomePage {
-  showGameSettings = false; // Controlla la visibilità del menu
-  
-  // Dati selezionabili
-  difficulty = 'medium';
-  players = 1;
-  gameTime = 30;
-  isMultiplayer = false;
-  constructor(private menu: MenuController,private router: Router,private authService: AuthService) {}
+  settingsOpen = false;
+  selectedMode: string | null = null;
+  maxPlayers: number | null = null;
+  maxCells: number | null = null;
+  numCells: number | null = null;
+  vsCpu: boolean = false;
+  canJoinOrCreate = true;
+  availableGames: any[] = [];
+
+  constructor(private menu: MenuController,public router: Router,private authService: AuthService,private gameService: GameService, private modalCtrl: ModalController) {}
    gridSize = 8;
   board: number[][] = [];
 
-  ngOnInit() {
+  async ngOnInit() {
     this.generateSpiralBoard();
+    const storedGameId = localStorage.getItem('game_id');
+    this.canJoinOrCreate = await this.gameService.checkCanCreate(storedGameId || '');
+    if (this.canJoinOrCreate) {
+    this.fetchAvailableGames();
+  }
   }
 
   generateSpiralBoard() {
     const size = this.gridSize;
     this.board = Array.from({ length: size }, () => Array(size).fill(null));
-
     let value = 0;
     let top = 0;
     let bottom = size - 1;
     let left = 0;
     let right = size - 1;
+
 
     while (value <= 63) {
       // Top row
@@ -74,12 +84,89 @@ export class HomePage {
   onRules(){
     this.router.navigateByUrl('/rules');
   }
-  openSettings(){
 
+  async openSettings() {
+    const modal = await this.modalCtrl.create({
+      component: GameSettingsModalComponent,
+      componentProps: {
+        defaultMaxPlayers: this.maxPlayers,
+        defaultMaxCells: this.maxCells,
+        defaultNumCells: this.numCells,
+        defaultVsCpu: this.vsCpu
+      }
+    });
+
+    modal.onDidDismiss().then(result => {
+      const data = result.data;
+      if (!data) return;
+
+      this.maxPlayers = data.maxPlayers;
+      this.maxCells = data.maxCells;
+      this.numCells = data.numCells;
+      this.vsCpu = data.vsCpu;
+
+      this.startGame(); // ora starta dopo conferma e chiude da solo
+    });
+
+    await modal.present();
   }
-  startGame() {
-    };
 
+  startGame() {
+    this.settingsOpen = false;
+
+    const userId = localStorage.getItem('token');
+    if (!userId) {
+      alert('Token utente non trovato!');
+      return;
+    }
+
+    // Costruzione opzioni dinamiche (solo se settate)
+    const options: any = {};
+
+    if (this.maxPlayers != null) options.max_players = this.maxPlayers;
+    if (this.maxCells != null) options.max_cells = this.maxCells;
+    if (this.numCells != null) options.num_cells = this.numCells;
+
+    this.gameService.createGame(userId, this.vsCpu, options).subscribe({
+      next: (res) => {
+        localStorage.setItem('game_id', res.game_id);
+        this.router.navigateByUrl('/game');
+      },
+      error: (err) => {
+        console.error('Errore nella creazione partita:', err);
+        alert('Errore durante la creazione della partita');
+      }
+    });
+  }
+fetchAvailableGames() {
+    const userId = localStorage.getItem('token');
+    if (!userId) return;
+
+    this.gameService.listGames(userId).subscribe({
+      next: (res) => {
+        this.availableGames = res.available_games || [];
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento partite disponibili:', err);
+      }
+    });
+  }
+
+  joinGame(gameId: string) {
+    const userId = localStorage.getItem('token');
+    if (!userId) return;
+
+    this.gameService.joinGame(userId).subscribe({
+      next: (res) => {
+        localStorage.setItem('game_id', res.game_id);
+        this.router.navigateByUrl('/game');
+      },
+      error: (err) => {
+        console.error('Errore nel join:', err);
+        alert('Errore durante il join della partita');
+      }
+    });
+  }
 }
 
 

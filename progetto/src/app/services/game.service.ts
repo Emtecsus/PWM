@@ -8,23 +8,37 @@ export class GameService {
 
   constructor(private http: HttpClient) {}
 
-  createGame(userId: string, vsCpu: boolean): Observable<any> {
-    return this.http.post(`${this.API_URL}/create_game`, { user_id: userId, vs_cpu: vsCpu });
-  }
-
-  setSpecialCells(gameId: string, userId: string, cells: any): Observable<any> {
-    return this.http.post(`${this.API_URL}/set_special_cells`, {
-      game_id: gameId,
+  createGame(userId: string, vsCpu: boolean, options: any): Observable<any> {
+    return this.http.post(`${this.API_URL}/create_game`, {
       user_id: userId,
-      cells: cells
+      vs_cpu: vsCpu,
+      ...options
     });
   }
+  async checkCanCreate(gameId: string): Promise<boolean> {
+    if (!gameId) return true;
 
-  generateRandomSpecialCells(gameId: string, userId: string, numCells: number): Observable<any> {
-    return this.http.post(`${this.API_URL}/generate_random_special_cells`, {
-      game_id: gameId,
-      user_id: userId,
-      num_cells: numCells
-    });
+    try {
+      const res: any = await this.http.get(`${this.API_URL}/game_state/${gameId}`).toPromise();
+      const status = res?.game?.status;
+      if (status !== 'finished') {
+        return false;
+      } else {
+        localStorage.removeItem('game_id');
+        return true;
+      }
+    } catch (err) {
+      console.error('Errore:', err);
+      return true; // fallback: permetti creazione
+    }
   }
+  listGames(userId: string) {
+    return this.http.get<any>(`${this.API_URL}/lista_games/${userId}`);
+  }
+
+  joinGame(userId: string) {
+    return this.http.post<any>(`${this.API_URL}/join_game`, { user_id: userId });
+  }
+
+
 }
