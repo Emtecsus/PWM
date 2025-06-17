@@ -109,12 +109,6 @@
 </div>
 </ng-container>
 
-
-
-
-
-
-
 <ng-template #content>
 <ion-header>
   <ion-toolbar>
@@ -128,87 +122,125 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-
   <!-- Spinner di caricamento -->
   <ion-spinner name="crescent" *ngIf="isLoading" class="ion-margin"></ion-spinner>
+  <img src="/assets/imgs/OcaSusino.png" alt="Oca Susino" class="oca-bg-footer">
+  <div class="rules-layout">
+    <!-- Colonna sinistra: Regole Generali -->
+    <div class="rules-left">
+      <ion-list-header>
+        <ion-label class="title">Regole Generali</ion-label>
+      </ion-list-header>
+      <ion-list class="Rules">
+        <ion-item class="item">
+          <ion-label>
+            I giocatori tirano un dado e avanzano di tante caselle quanto il numero ottenuto.<br>
+            Vince chi arriva esattamente alla casella 63.<br>
+            Se un giocatore supera la casella 63, torna indietro di tante caselle quante eccede.
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
 
-  <!-- Introduzione -->
- <ion-list-header>
-    <ion-label class="title">Regole Generali</ion-label>
-  </ion-list-header>
-  <ion-list class="Rules">
-  <ion-item class="item">
-    <ion-label>I giocatori tirano un dado e avanzano di tante caselle quanto il numero ottenuto.</ion-label>
-  </ion-item>
-  <ion-item class="item">
-    <ion-label>Vince chi arriva esattamente alla casella 63.</ion-label>
-  </ion-item>
-  <ion-item class="item">
-    <ion-label>Se un giocatore supera la casella 63, torna indietro di tante caselle quante eccede.</ion-label>
-  </ion-item>
-</ion-list>
+    <!-- Colonna destra: Caselle Speciali -->
+    <div class="rules-right">
+      <ion-list class="special">
+        <ion-list-header>
+          <ion-label>Caselle Speciali</ion-label>
+        </ion-list-header>
+      </ion-list>
+      <div class="cards-column">
+        <!-- Le tue ion-card già pronte, esempio: -->
+        <ion-card class="card" [class.flipped]="isFlippedOca" (click)="isFlippedOca = !isFlippedOca">
+          <div class="inner">
+            <div class="back">
+              <ion-card-header>
+                <ion-card-title>
+                  <ion-icon name="paw-outline" slot="start"></ion-icon>
+                  Casella Oca
+                </ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <ion-icon name="paw-outline"></ion-icon>
+                Il giocatore avanza di nuovo dello stesso numero di caselle.
+              </ion-card-content>
+            </div>
+            <div class="front">
+              <img src="/assets/imgs/goose_german.png" alt="OcaGermanica" style="width: 50%;">
+            </div>
+          </div>
+        </ion-card>
+        <ion-card class="card" [class.flipped] = "isFlippedPonte" (click) = "isFlippedPonte = !isFlippedPonte">
+  <div class = "inner">
+    <div class = "back">
+      <ion-card-header>
+        <ion-card-title>Casella Ponte</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-icon name="walk-outline"></ion-icon>
+        Il giocatore salta alla casella 12.
+      </ion-card-content>
+    </div>
+    <div class = "front">
+      <img src= "/assets/imgs/bridge.png" alt = "ponteDiMessina" style="width: 85%;">
+    </div>
+  </div>
+</ion-card>
 
-  <!-- Caselle Speciali -->
-  <ion-list class = "special">
-    <ion-list-header>
-      <ion-label>Caselle Speciali</ion-label>
-    </ion-list-header>
-  </ion-list>
+<ion-card class="card" [class.flipped] = "isFlippedLocanda" (click) = "isFlippedLocanda = !isFlippedLocanda">
+  <div class = "inner">
+    <div class = "back">
+      <ion-card-header>
+        <ion-card-title>Casella Locanda</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+       <ion-icon name="bed-outline"></ion-icon>
+         Il giocatore salta un turno.
+      </ion-card-content>
+    </div>
+    <div class = "front">
+      <img src = "/assets/imgs/locanda.png" alt = "Locanda" style = "width: 100%;">
+    </div>
+  </div>
+</ion-card>  
 
-  <ion-card class="item">
-    <ion-card-header>
-      <ion-card-title>
-        <ion-icon name="paw-outline" slot="start"></ion-icon>
-        Casella Oca
-      </ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-icon name="paw-outline"></ion-icon>
-      Il giocatore avanza di nuovo dello stesso numero di caselle.
+<ion-card class="card" [class.flipped] = "isFlippedPrigione" (click) = "isFlippedPrigione = !isFlippedPrigione">  
+  <div class = "inner">
+    <div class = "back">  
+     <ion-card-header>
+        <ion-card-title>Casella Prigione</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        Il giocatore salta due turni.
     </ion-card-content>
+  </div>
+    <div class = "front">
+      <img src = "/assets/imgs/prison.png" alt = "Prison" style = "width: 85%;">
+    </div>
+  </div>
+</ion-card>    
 
-
-
-  <ion-card-header>
-    <ion-card-title>Casella Ponte</ion-card-title>
-  </ion-card-header>
-  <ion-card-content>
-    <ion-icon name="walk-outline"></ion-icon>
-    Il giocatore salta alla casella 12.
-  </ion-card-content>
-
-
-  
-    <ion-card-header>
-      <ion-card-title>Casella Locanda</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-icon name="bed-outline"></ion-icon>
-      Il giocatore salta un turno.
-    </ion-card-content>
-  
-
-  
-    <ion-card-header>
-      <ion-card-title>Casella Prigione</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-icon name="lock-closed-outline"></ion-icon>
-      Il giocatore salta due turni.
-    </ion-card-content>
-  
-
-  
-    <ion-card-header>
-      <ion-card-title>Casella Morte</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-icon name="skull-outline"></ion-icon>
-      Il giocatore torna all'inizio.
-    </ion-card-content>
+  <ion-card class="card" [class.flipped] = "isFlippedMorte" (click) = "isFlippedMorte = !isFlippedMorte">  
+    <div class = "inner">
+      <div class = "back">
+      <ion-card-header>
+        <ion-card-title>Casella Morte</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-icon name="skull-outline"></ion-icon>
+        Il giocatore torna all'inizio.
+      </ion-card-content>
+  </div>
+    <div class = "front">
+      <img src ="/assets/imgs/death.png" alt = "Death" style = "width: 70%;">
+    </div>
+  </div>
   </ion-card>
-<button expand="block" color="secondary" (click)="onHome()">Torna alla Home</button>
-<!--<div class="goose" style="top: 350px; left: 150px;"></div>-->
+      </div>
+    </div>
+  </div>
+  <!--<button expand="block" color="secondary" (click)="onHome()">Torna alla Home</button>-->
 </ion-content>
 </ng-template>
 
