@@ -41,7 +41,7 @@ onForgotPassword() {
 
     this.authService.login(username, password).subscribe({
       next: (res) => {
-        localStorage.setItem('token', res.token);
+        localStorage.setItem('token', res.user_id);
         this.router.navigateByUrl('/home');
       },
       error: (err) => {

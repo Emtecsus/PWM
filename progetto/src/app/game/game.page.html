@@ -1,19 +1,18 @@
 <ion-content fullscreen>
 
-  <!-- SELEZIONE PEDINA + DADO -->
   <div class="top-controls">
     <ion-item>
       <ion-label>Scegli la tua pedina</ion-label>
       <ion-select [(ngModel)]="selectedPawn" (ionChange)="savePawnChoice()">
         <ion-select-option *ngFor="let p of availablePawns" [value]="p">
-          <img [src]="'assets/' + p" style="width: 30px; margin-right: 8px;">
+          <img [src]="'assets/imgs/' + p" style="width: 30px; margin-right: 8px;">
           {{ p }}
         </ion-select-option>
       </ion-select>
     </ion-item>
 
     <div class="dice-container">
-      <img src="assets/dice.png" alt="Lancia dado" (click)="rollDice()" class="dice-button">
+      <img src="assets/imgs/dice.png" alt="Lancia dado" (click)="rollDice()" class="dice-button">
     </div>
   </div>
 

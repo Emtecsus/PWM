@@ -18,15 +18,17 @@ export class GamePage implements OnInit {
   board: number[][] = [];
   players: any[] = [];
 
-  gameId: string = '...'; // imposta dinamicamente
-  userId: string = '...'; // imposta dinamicamente
+  gameId: string = '33a42253-4de9-47bd-a053-f595ba3597e8'; // TODO imposta dinamicamente
+  userId: string = localStorage.getItem('token') || '';
+  
 
-  availablePawns = ['pawn_red.png', 'pawn_green.png', 'pawn_blue.png', 'pawn_yellow.png'];
-  selectedPawn = 'pawn_red.png';
+  availablePawns = ['goose_musc.png', 'goose_classy1.png', 'goose_magic.png', 'goose_party.png'];
+  selectedPawn = 'goose_musc.png';
 
   ngOnInit() {
+    console.log(this.userId);
     this.generateSpiralBoard();
-
+    
     const saved = localStorage.getItem('pawn_' + this.userId);
     if (saved) this.selectedPawn = saved;
 
@@ -62,11 +64,11 @@ export class GamePage implements OnInit {
 
   getPawnImage(userId: string): string {
     const stored = localStorage.getItem('pawn_' + userId);
-    return stored ? 'assets/' + stored : 'assets/pawn_default.png';
+    return stored ? 'assets/' + stored : 'assets/imgs/goose_musc.png';
   }
 
   rollDice() {
-    fetch('http://localhost:5000/roll_dice', {
+    fetch('https://api.peppeponte.duckdns.org/roll_dice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: this.userId, game_id: this.gameId })
@@ -76,7 +78,7 @@ export class GamePage implements OnInit {
   }
 
   updateGameState() {
-    fetch(`http://localhost:5000/game_state/${this.gameId}`)
+    fetch(`https://api.peppeponte.duckdns.org/game_state/${this.gameId}`)
       .then(res => res.json())
       .then(data => {
         this.players = data.game.players;
