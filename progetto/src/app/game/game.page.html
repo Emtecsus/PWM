@@ -10,6 +10,20 @@
   </ion-header>
 
 <ion-content fullscreen>
+  <ion-card class="winner-banner" *ngIf="winnerUsername">
+    <ion-text color="success">
+      <h2>🏆 {{ winnerUsername }} ha vinto la partita!</h2>
+    </ion-text>
+  </ion-card>
+
+  <div class="turn-indicator">
+    <ion-text color="light">
+      Turno di: {{ currentTurnUsername === myUsername ? 'Te' : currentTurnUsername }}
+    </ion-text>
+  </div>
+  <ion-card *ngIf="specialEffectMessage" class="special-effect">
+    <ion-text color="danger">{{ specialEffectMessage }}</ion-text>
+  </ion-card>
 
   <!-- TABELLA DI GIOCO -->
   <div class="board-container">

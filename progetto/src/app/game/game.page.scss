@@ -196,3 +196,27 @@ ion-button {
    z-index: 10;
   position: relative;
 }
+.winner-banner {
+  position: fixed;
+  top: 20vh;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  padding: 16px;
+  background-color: #eeef20;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  border-radius: 8px;
+}
+.special-effect {
+  position: fixed;
+  bottom: 10vh;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ffd166;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-weight: bold;
+  z-index: 1000;
+}

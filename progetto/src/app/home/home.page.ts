@@ -25,7 +25,7 @@ export class HomePage {
   vsCpu: boolean = false;
   canJoinOrCreate = true;
   availableGames: any[] = [];
-
+  gamesPollingInterval: any;
   constructor(private menu: MenuController,public router: Router,private authService: AuthService,private gameService: GameService, private modalCtrl: ModalController) {}
    gridSize = 8;
   board: number[][] = [];
@@ -36,7 +36,30 @@ export class HomePage {
     this.canJoinOrCreate = await this.gameService.checkCanCreate(storedGameId || '');
     if (this.canJoinOrCreate) {
     this.fetchAvailableGames();
+    this.startGameListPolling();
+    }
+  
   }
+    stopGameListPolling() {
+    if (this.gamesPollingInterval) {
+      clearInterval(this.gamesPollingInterval);
+      this.gamesPollingInterval = null;
+    }
+  }
+  startGameListPolling() {
+    const userId = localStorage.getItem('token');
+    if (!userId) return;
+
+    this.gamesPollingInterval = setInterval(() => {
+      fetch(`https://api.peppeponte.duckdns.org/lista_games/${userId}`)
+        .then(res => res.json())
+        .then(data => {
+          this.availableGames = data.available_games || [];
+        })
+        .catch(err => {
+          console.error('Errore nel recupero delle partite disponibili:', err);
+        });
+    }, 1000); // ogni secondo
   }
 
   generateSpiralBoard() {
@@ -77,11 +100,13 @@ export class HomePage {
     
   }
   onLogout() {
+    this.stopGameListPolling();
     this.authService.logout();
     this.router.navigateByUrl('/login');
   }
 
   onRules(){
+    this.stopGameListPolling();
     this.router.navigateByUrl('/rules');
   }
 
@@ -130,6 +155,7 @@ export class HomePage {
     this.gameService.createGame(userId, this.vsCpu, options).subscribe({
       next: (res) => {
         localStorage.setItem('game_id', res.game_id);
+        this.stopGameListPolling();
         this.router.navigateByUrl('/game');
       },
       error: (err) => {
@@ -155,10 +181,10 @@ fetchAvailableGames() {
   joinGame(gameId: string) {
     const userId = localStorage.getItem('token');
     if (!userId) return;
-
     this.gameService.joinGame(userId).subscribe({
       next: (res) => {
         localStorage.setItem('game_id', res.game_id);
+        this.stopGameListPolling();
         this.router.navigateByUrl('/game');
       },
       error: (err) => {
