@@ -37,7 +37,7 @@
           {{ cell || '' }}
           <!-- PEDINA -->
           <ng-container *ngFor="let player of players">
-            <img *ngIf="player.position === (cell-1)"
+            <img *ngIf="player.position === (cell)"
                  [src]="getPawnImage(player.user_id)"
                  class="pawn"
                  alt="pedina">
