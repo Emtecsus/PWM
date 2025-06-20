@@ -368,19 +368,35 @@ def roll_dice():
 
         new_pos = pos + dice
 
-        # Check penalty 
-        if new_pos in PENALTY_CELLS:
-            penalty = PENALTY_CELLS[new_pos]
-            if penalty['type'] == 'back': # Modificato per sapere se sono su una casella di back siccome non è specificato
-                new_pos = max(0, new_pos - penalty['value'])
-                return jsonify({
-                    'back': penalty['value'],
-                    'dice': dice,
-                    'new_position': new_pos
-                })
-            elif penalty['type'] == 'skip':
-                conn.execute(
-                    "UPDATE game_players SET skip_turn=1 WHERE game_id=? AND user_id=?", (game_id, user_id))
+    # Aggiorna posizione dopo lancio del dado
+    conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
+                (new_pos, game_id, user_id))
+
+    # Controllo penalità
+    if new_pos in PENALTY_CELLS:
+        penalty = PENALTY_CELLS[new_pos]
+        if penalty['type'] == 'back':
+            back_value = penalty['value']
+            back_pos = max(0, new_pos - back_value)
+            # Aggiorna la posizione effettiva dopo il back
+            conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
+                        (back_pos, game_id, user_id))
+            
+            # Avanza turno
+            c.execute("SELECT user_id FROM game_players WHERE game_id=?", (game_id,))
+            players = [row[0] for row in c.fetchall()]
+            next_index = (players.index(user_id) + 1) % len(players)
+            next_turn = players[next_index]
+            conn.execute("UPDATE games SET current_turn=? WHERE id=?", (next_turn, game_id))
+
+            return jsonify({
+                'back': back_value,
+                'dice': dice,
+                'new_position': back_pos
+            })
+        elif penalty['type'] == 'skip':
+            conn.execute("UPDATE game_players SET skip_turn=1 WHERE game_id=? AND user_id=?",
+                        (game_id, user_id))
 
         if new_pos > max_cells:
             
