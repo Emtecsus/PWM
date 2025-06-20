@@ -26,11 +26,6 @@ export const routes: Routes = [
     loadComponent: () => import('./home/home.page').then( m => m.HomePage)
   },
   {
-    path: 'tutorial',
-    canActivate: [authGuard], // protetta
-    loadComponent: () => import('./tutorial/tutorial.page').then( m => m.TutorialPage)
-  },
-  {
     path: 'game',
     canActivate: [authGuard], // protetta
     loadComponent: () => import('./game/game.page').then( m => m.GamePage)

@@ -3,7 +3,8 @@ import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-
+import { GameService } from '../services/game.service';
+import { firstValueFrom } from 'rxjs';
 @Component({
   selector: 'app-game',
   templateUrl: './game.page.html',
@@ -14,34 +15,36 @@ import { Router } from '@angular/router';
 export class GamePage implements OnInit {
   isLoading: boolean = true;
   private pollingInterval: any;
-  constructor(public router:Router) {}
-  //private API_URL = 'https://api.peppeponte.duckdns.org';
-  private API_URL = 'http://localhost:5000';
-  
+  constructor(public router:Router, private gameService: GameService) {}
   gridSize = 8;
   board: number[][] = [];
   players: any[] = [];
-
-  gameId: string = localStorage.getItem('game_id') || '';
+  penaltyBackValue: number | null = null;
+  gameId: string = '';
   userId: string = localStorage.getItem('token') || '';
   winnerUsername: string | null = null;
   gameFinished: boolean = false;
   availablePawns = ['goose_musc.png', 'goose_classy1.png', 'goose_magic.png', 'goose_party.png'];
   selectedPawn = 'goose_musc.png';
   showPawnSelector = false;
-  // Variabile per il messaggio dell'effetto speciale
   specialEffectMessage: string = '';
   myUsername: string = '';
   // Mappa delle celle speciali attuali
   specialCells: { [key: number]: { type: string; value: number } } = {};
-  // Username del giocatore il cui turno è attivo
   currentTurnUsername: string = '';
-  // Funzione per ottenere lo username via ID (verifica se è già nel file)
+  private isPolling = false; // Variabile di protezione per le chiamate asincrone
+  diceValues: { [userId: string]: number } = {};
+  isRolling = false;
+
   async getUsernameById(userId: string): Promise<string> {
-    const response = await fetch(`${this.API_URL}/get_username/${userId}`);
-    const data = await response.json();
-    return data['Username cercato'] || 'Sconosciuto';
+    try {
+      const res = await firstValueFrom(this.gameService.getUsernameById(userId));
+      return res['Username cercato'] || 'Sconosciuto';
+    } catch (err) {
+      return 'Errore';
+    }
   }
+
 
 
   selectPawn(pawnName: string) {
@@ -55,27 +58,35 @@ export class GamePage implements OnInit {
   }
 
   ngOnInit() {
+    this.gameId=localStorage.getItem('game_id') || '';
     this.generateSpiralBoard();
+    setTimeout(() => {
+      this.isLoading = false;
+    }, 2000);
     const saved = localStorage.getItem('pawn_' + this.userId);
     if (saved) this.selectedPawn = saved;
-    const userId = localStorage.getItem('token');
-    if (userId) {
-      fetch(`${this.API_URL}/get_username/${userId}`)
-        .then(res => res.json())
-        .then(data => {
-          this.myUsername = data['Username cercato'];
-        });
+    if (this.userId) {
+      this.gameService.getUsernameById(this.userId).subscribe({
+        next: (res) => {
+          this.myUsername = res['Username cercato'];
+        },
+        error: (err) => {
+          console.error('Errore nel recupero username:', err);
+          this.myUsername = 'Sconosciuto';
+        }
+      });
     }
-    
-
     this.updateGameState();
     this.startPollingGameState();
   }
 
   startPollingGameState() {
     this.pollingInterval = setInterval(() => {
-      this.updateGameState();
-    }, 2000); // ogni 2 secondi
+      if (!this.isPolling) {
+        this.isPolling = true;
+        this.updateGameState().finally(() => this.isPolling = false);
+      }
+    }, 2000);
   }
   generateSpiralBoard() {
     const size = this.gridSize;
@@ -92,13 +103,6 @@ export class GamePage implements OnInit {
       for (let i = bottom; i >= top && value <= 63; i--) this.board[i][left] = value++;
       left++;
     }
-  }
-  
-
-  getCellGradientColor(value: number | null): string {
-    if (!value) return 'transparent';
-    const hue = 120 - ((value - 1) / 62) * 120;
-    return `hsl(${hue}, 70%, 50%)`;
   }
 
   savePawnChoice() {
@@ -117,58 +121,80 @@ export class GamePage implements OnInit {
   rollDice(userIdOverride?: string) {
     const userId = userIdOverride || this.userId;
 
-    fetch('http://localhost:5000/roll_dice', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: userId, game_id: this.gameId })
-    })
-    .then(res => res.json())
-    .then(res => {
-      const effetto = res?.message || '';
-      if (effetto.includes('Turn skipped')) {
-        this.specialEffectMessage = 'Casella speciale! Salti il prossimo turno.';
-      } else if (effetto.includes('Dice rolled') && res.new_position !== undefined) {
-        const cellType = this.specialCells[res.new_position];
-        if (cellType?.type === 'back') {
-          this.specialEffectMessage = `Casella speciale! Torni indietro di ${cellType.value} caselle.`;
-        } else if (cellType?.type === 'skip') {
-          this.specialEffectMessage = 'Casella speciale! Salti il turno.';
+    const isCpuThrow = userId !== this.userId;
+    if (!isCpuThrow && this.isRolling) return;
+
+    if (!isCpuThrow) this.isRolling = true;
+
+    this.gameService.rollDice(userId, this.gameId).subscribe({
+      next: (res) => {
+        if (!isCpuThrow) {
+          if (res.dice >= 1 && res.dice <= 6) {
+            this.diceValues[this.userId] = res.dice;
+          }
+          this.isRolling = false;
+
+          // ✅ Mostra messaggi solo se l'effetto riguarda il player locale
+          if (res.back !== undefined) {
+            this.specialEffectMessage = `Casella speciale! Torni indietro di ${res.back} caselle.`;
+          } else if (res?.message?.includes('Turn skipped')) {
+            this.specialEffectMessage = 'Casella speciale! Salti il prossimo turno.';
+          } else {
+            this.specialEffectMessage = '';
+          }
+
         } else {
+          // ❌ Se è CPU, nessun messaggio speciale
           this.specialEffectMessage = '';
         }
-      }
-      this.updateGameState();
-    })
 
+        this.updateGameState();
+      },
+      error: (err) => {
+        console.error('Errore nel lancio del dado:', err);
+        if (!isCpuThrow) this.isRolling = false;
+      }
+    });
   }
 
 
-  async updateGameState() {
-    const res = await fetch(`${this.API_URL}/game_state/${this.gameId}`);
-    const data = await res.json();
-    const game = data.game;
 
-    this.players = game.players;
-    this.currentTurnUsername = await this.getUsernameById(game.current_turn);
+  async updateGameState(): Promise<void> {
+    try {
+      const data = await firstValueFrom(this.gameService.getGameState(this.gameId));
+      const game = data.game;
+      this.players = game.players;
 
-    if (game.status === 'finished') {
-      this.gameFinished = true;
+      this.gameService.getUsernameById(game.current_turn).subscribe({
+        next: res => this.currentTurnUsername = res['Username cercato'] || 'Sconosciuto',
+        error: _ => this.currentTurnUsername = 'Sconosciuto'
+      });
 
-      if (game.winner) {
-        this.winnerUsername = await this.getUsernameById(game.winner);
+      if (game.status === 'finished') {
+        this.gameFinished = true;
+        if (game.winner) {
+          this.gameService.getUsernameById(game.winner).subscribe({
+            next: res => this.winnerUsername = res['Username cercato'] || 'Sconosciuto',
+            error: _ => this.winnerUsername = 'Sconosciuto'
+          });
+        }
+        return;
       }
 
-      return;
-    }
+      const currentTurn = game.current_turn;
+      const player = this.players.find(p => p.user_id === currentTurn);
+      const isCpu = player?.is_cpu;
 
-    const currentTurn = game.current_turn;
-    const player = this.players.find(p => p.user_id === currentTurn);
-    const isCpu = player?.is_cpu;
+      if (isCpu) {
+        setTimeout(() => this.rollDice(currentTurn), 1000);
+      }
 
-    if (isCpu) {
-      setTimeout(() => this.rollDice(currentTurn), 1000);
+    } catch (err) {
+      console.error('Errore nel recuperare lo stato della partita:', err);
     }
   }
+
+
   goHome(){
     localStorage.removeItem('game_id')
     return this.router.navigateByUrl('/home')

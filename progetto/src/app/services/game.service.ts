@@ -37,11 +37,23 @@ export class GameService {
     return this.http.get<any>(`${this.API_URL}/lista_games/${userId}`);
   }
 
-  joinGame(userId: string) {
-    return this.http.post<any>(`${this.API_URL}/join_game`, { user_id: userId });
+  joinGame(userId: string, gameId: string) {
+    return this.http.post<any>(`${this.API_URL}/join_game`, { user_id: userId, game_id: gameId });
   }
   getMyGames(userId: string): Observable<any> {
     return this.http.get(`${this.API_URL}/my_games/${userId}`);
+  }
+  rollDice(userId: string, gameId: string): Observable<any> {
+    return this.http.post(`${this.API_URL}/roll_dice`, {
+      user_id: userId,
+      game_id: gameId
+    });
+  }
+  getUsernameById(userId: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/get_username/${userId}`);
+  }
+  getGameState(gameId: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/game_state/${gameId}`);
   }
 
 

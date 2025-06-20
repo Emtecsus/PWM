@@ -1,4 +1,4 @@
-<ng-container *ngIf="isLoading" else="content">
+<ng-container *ngIf="isLoading; else content">
 <div class="loader">
   <span class="l">
     <svg
@@ -106,7 +106,8 @@
     </svg>
   </span>
 </div>
-
+</ng-container>
+<ng-template #content>
 <div class="ion-page" id="main-content">
    <!-- Spinner di caricamento -->
   <ion-spinner name="crescent" *ngIf="isLoading" class="ion-margin"></ion-spinner>
@@ -129,12 +130,29 @@
 
   <div class="turn-indicator">
     <ion-text color="light">
-      Turno di: {{ currentTurnUsername === myUsername ? 'Te' : currentTurnUsername }}
+      Turno di: {{ currentTurnUsername === myUsername ? myUsername : currentTurnUsername }}
     </ion-text>
   </div>
+
   <ion-card *ngIf="specialEffectMessage" class="special-effect">
-    <ion-text color="danger">{{ specialEffectMessage }}</ion-text>
+    <ion-card-header>
+      <ion-card-title>Effetto speciale!</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      {{ specialEffectMessage }}
+    </ion-card-content>
   </ion-card>
+  
+
+  <ion-card *ngIf="penaltyBackValue !== null" color="warning">
+    <ion-card-header>
+      <ion-card-title>Effetto speciale!</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      Torni indietro di {{ penaltyBackValue }} caselle!
+    </ion-card-content>
+  </ion-card>
+
 
   <!-- TABELLA DI GIOCO -->
   <div class="board-container">
@@ -159,10 +177,12 @@
   </div>
 
   <!-- DADO FLOATING -->
-  <img src="assets/imgs/dice.png"
-       alt="Lancia dado"
-       class="floating-dice"
-       (click)="rollDice()" />
+  
+  <div class="floating-dice" [class.rolling]="isRolling" (click)="rollDice()">
+    <img
+      [src]="'assets/imgs/dice_' + (diceValues[userId] || 1) + '.png'"
+      [alt]="'Dado: ' + (diceValues[userId] || 1)" />
+  </div>
 
   <!-- Pulsante scelta pedina -->
   <img src="assets/imgs/goose_musc.png"
@@ -185,4 +205,4 @@
 
 </ion-content>
 </div>
-</ng-container>
+</ng-template>

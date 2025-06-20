@@ -32,40 +32,8 @@ export class HomePage {
 
   async ngOnInit() {
     this.generateSpiralBoard();
-    this.fetchAvailableGames();
-    this.gameService.getMyGames(localStorage.getItem('token') || '').subscribe({
-      next: (res) => {
-        this.myGames = res.joined_games;
-      },
-      error: (err) => {
-        console.error('Errore nel caricamento delle mie partite:', err);
-        this.myGames = [];
-      }
-    });
-
     this.startGameListPolling();
   
-  }
-    stopGameListPolling() {
-    if (this.gamesPollingInterval) {
-      clearInterval(this.gamesPollingInterval);
-      this.gamesPollingInterval = null;
-    }
-  }
-  startGameListPolling() {
-    const userId = localStorage.getItem('token');
-    if (!userId) return;
-
-    this.gamesPollingInterval = setInterval(() => {
-      fetch(`https://api.peppeponte.duckdns.org/lista_games/${userId}`)
-        .then(res => res.json())
-        .then(data => {
-          this.availableGames = data.available_games || [];
-        })
-        .catch(err => {
-          console.error('Errore nel recupero delle partite disponibili:', err);
-        });
-    }, 1000); // ogni secondo
   }
 
   generateSpiralBoard() {
@@ -150,9 +118,15 @@ export class HomePage {
       alert('Token utente non trovato!');
       return;
     }
+    if (this.maxPlayers && (this.maxPlayers < 2 || this.maxPlayers > 4 || this.maxPlayers <= 0)) {
+      alert('Il numero massimo di giocatori deve essere tra 2 e 4');
+      return;
+    }
 
     // Costruzione opzioni dinamiche (solo se settate)
     const options: any = {};
+
+
 
     if (this.maxPlayers != null) options.max_players = this.maxPlayers;
     if (this.maxCells != null) options.max_cells = this.maxCells;
@@ -170,19 +144,42 @@ export class HomePage {
       }
     });
   }
-fetchAvailableGames() {
+
+  startGameListPolling() {
     const userId = localStorage.getItem('token');
     if (!userId) return;
 
-    this.gameService.listGames(userId).subscribe({
-      next: (res) => {
-        this.availableGames = res.available_games || [];
-      },
-      error: (err) => {
-        console.error('Errore nel caricamento partite disponibili:', err);
-      }
-    });
+    this.gamesPollingInterval = setInterval(() => {
+      // Lista partite disponibili
+      this.gameService.listGames(userId).subscribe({
+        next: (res) => {
+          this.availableGames = res.available_games || [];
+        },
+        error: (err) => {
+          console.error('Errore nel recupero partite disponibili:', err);
+        }
+      });
+
+      // Lista mie partite in corso
+      this.gameService.getMyGames(userId).subscribe({
+        next: (res) => {
+          this.myGames = res.joined_games || [];
+        },
+        error: (err) => {
+          console.error('Errore nel recupero delle mie partite:', err);
+          this.myGames = [];
+        }
+      });
+
+    }, 1000); // ogni secondo
   }
+  stopGameListPolling() {
+    if (this.gamesPollingInterval) {
+      clearInterval(this.gamesPollingInterval);
+      this.gamesPollingInterval = null;
+    }
+  }
+
   resumeGame(gameId: string){
     const userId = localStorage.getItem('token');
     localStorage.removeItem('game_id');
@@ -191,11 +188,12 @@ fetchAvailableGames() {
     this.stopGameListPolling();
     this.router.navigateByUrl('/game');
   }
+
   joinGame(gameId: string) {
     const userId = localStorage.getItem('token');
     localStorage.removeItem('game_id');
     if (!userId) return;
-    this.gameService.joinGame(userId).subscribe({
+    this.gameService.joinGame(userId, gameId).subscribe({
       next: (res) => {
         localStorage.setItem('game_id', res.game_id);
         this.stopGameListPolling();

@@ -15,9 +15,9 @@ export class GameSettingsModalComponent  implements OnInit {
   @Input() defaultMaxCells: number | null = null;
   @Input() defaultNumCells: number | null = null;
   @Input() defaultVsCpu: boolean = false;
-  maxPlayers: number | null = null;  // <-- aggiunto
-  maxCells: number | null = null;    // <-- aggiunto
-  numCells: number | null = null;    // <-- aggiunto
+  maxPlayers: number | null = null;  
+  maxCells: number | null = null;    
+  numCells: number | null = null;    
   vsCpu: boolean = false; 
 
 

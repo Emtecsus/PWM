@@ -257,67 +257,66 @@ def create_game():
                 }), 201
     except sqlite3.Error as e:
         return jsonify({'error': 'Database error', 'details': str(e)}), 500
-    
+
+# Modificata in modo tale che possiamo prendere le partite in corso vecchie
 @app.route('/join_game', methods=['POST'])
 def join_game():
     data = request.get_json()
-    user_id = data['user_id']    
+    user_id = data['user_id']
+    game_id = data['game_id']
+
     with sqlite3.connect(DB) as conn:
         c = conn.cursor()
+
+        # Verifica che la partita esista e sia in stato 'waiting'
         c.execute('''
-                SELECT 
-                    g.id as game_id,
-                    g.status,
-                    g.max_players,
-                    g.player_count as current_players,
-                    (
-                        SELECT u.username 
-                        FROM game_players gp
-                        JOIN users u ON gp.user_id = u.id
-                        WHERE gp.game_id = g.id AND gp.is_cpu = 0
-                        LIMIT 1
-                    ) as creator
-                FROM 
-                    games g
-                WHERE 
-                    g.status = 'waiting'
-                    AND g.player_count < g.max_players
-                    AND NOT EXISTS (
-                        SELECT 1 
-                        FROM game_players gp 
-                        WHERE gp.game_id = g.id AND gp.user_id = ?
-                    )
-            ''', (user_id,))
-        game = c.fetchone()   
-        if game:
-            game_id = game[0]
-            status = game[1]
-            max_players = game[2]
-            current_players = game[3]
-            print("join game", game_id, user_id, status, current_players, max_players)
-            
-            if current_players +1 == max_players:
-                conn.execute("""
-                             UPDATE games 
-                             SET status='ongoing',
-                             player_count= ?
-                             WHERE id=?
-                             """, (current_players+1, game_id,))
-            else:
-                conn.execute("""
-                             UPDATE games 
-                             SET player_count= ?
-                             WHERE id=?
-                             """, (current_players + 1, game_id))
-            
-            c.execute("INSERT INTO game_players (game_id, user_id, position, is_cpu) VALUES (?, ?, ?, ?)",
-                         (game_id, user_id, 0, 0))
-            return jsonify({'message': 'Joined game', 'game_id': game_id})
-            
-            
-            
-            
-        return jsonify({'error': 'Non ci sono partite disponibili'}), 404
+            SELECT 
+                status, player_count, max_players
+            FROM games
+            WHERE id = ?
+        ''', (game_id,))
+        game = c.fetchone()
+
+        if not game:
+            return jsonify({'error': 'Partita non trovata'}), 404
+
+        status, current_players, max_players = game
+
+        if status != 'waiting':
+            return jsonify({'error': 'La partita non è più disponibile'}), 400
+
+        if current_players >= max_players:
+            return jsonify({'error': 'La partita è piena'}), 400
+
+        # Verifica che l'utente non sia già iscritto
+        c.execute('''
+            SELECT 1 FROM game_players WHERE game_id = ? AND user_id = ?
+        ''', (game_id, user_id))
+        if c.fetchone():
+            return jsonify({'error': 'Sei già iscritto a questa partita'}), 400
+
+        # Aggiungi il giocatore
+        c.execute('''
+            INSERT INTO game_players (game_id, user_id, position, is_cpu)
+            VALUES (?, ?, 0, 0)
+        ''', (game_id, user_id))
+
+        new_count = current_players + 1
+        if new_count == max_players:
+            c.execute('''
+                UPDATE games
+                SET player_count = ?, status = 'ongoing'
+                WHERE id = ?
+            ''', (new_count, game_id))
+        else:
+            c.execute('''
+                UPDATE games
+                SET player_count = ?
+                WHERE id = ?
+            ''', (new_count, game_id))
+
+        return jsonify({'message': 'Joined game', 'game_id': game_id}), 200
+
 
 
 @app.route('/roll_dice', methods=['POST'])
@@ -369,11 +368,16 @@ def roll_dice():
 
         new_pos = pos + dice
 
-        # Check penalty
+        # Check penalty 
         if new_pos in PENALTY_CELLS:
             penalty = PENALTY_CELLS[new_pos]
-            if penalty['type'] == 'back':
+            if penalty['type'] == 'back': # Modificato per sapere se sono su una casella di back siccome non è specificato
                 new_pos = max(0, new_pos - penalty['value'])
+                return jsonify({
+                    'back': penalty['value'],
+                    'dice': dice,
+                    'new_position': new_pos
+                })
             elif penalty['type'] == 'skip':
                 conn.execute(
                     "UPDATE game_players SET skip_turn=1 WHERE game_id=? AND user_id=?", (game_id, user_id))
@@ -386,6 +390,7 @@ def roll_dice():
         elif new_pos == max_cells:
             conn.execute(
                 "UPDATE games SET status='finished', winner=? WHERE id=?", (user_id, game_id))
+                 return jsonify({'message': 'Dice rolled', 'dice': dice, 'new_position': new_pos})
         else:
             conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
                          (new_pos, game_id, user_id))
@@ -431,7 +436,7 @@ def game_state(game_id):
                 "max_cells": game[-1],
             }
         })
-
+# Aggiunta
 @app.route('/my_games/<user_id>', methods=['GET'])
 def my_games(user_id):
     try:

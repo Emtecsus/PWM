@@ -97,12 +97,7 @@
           <ion-list>
             <ion-item>
               <ion-label position="stacked">Numero massimo di giocatori</ion-label>
-              <ion-input type="number" [(ngModel)]="maxPlayers" placeholder="Default: 4"></ion-input>
-            </ion-item>
-
-            <ion-item>
-              <ion-label position="stacked">Numero massimo di caselle</ion-label>
-              <ion-input type="number" [(ngModel)]="maxCells" placeholder="Default: 63"></ion-input>
+              <ion-input type="number" [(ngModel)]="maxPlayers" placeholder="Default: 4" min="2" max="4"></ion-input>
             </ion-item>
 
             <ion-item>
