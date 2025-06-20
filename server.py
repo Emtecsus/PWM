@@ -390,7 +390,10 @@ def roll_dice():
         elif new_pos == max_cells:
             conn.execute(
                 "UPDATE games SET status='finished', winner=? WHERE id=?", (user_id, game_id))
-                 return jsonify({'message': 'Dice rolled', 'dice': dice, 'new_position': new_pos})
+            return jsonify({ # Modificato 
+                'dice': dice,
+                'new_position': new_pos
+            })
         else:
             conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
                          (new_pos, game_id, user_id))
