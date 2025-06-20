@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
   imports: [IonicModule, CommonModule, FormsModule]
 })
 export class GamePage implements OnInit {
+  isLoading: boolean = true;
   private pollingInterval: any;
   constructor(public router:Router) {}
   

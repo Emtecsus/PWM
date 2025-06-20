@@ -15,25 +15,33 @@ export class GameSettingsModalComponent  implements OnInit {
   @Input() defaultMaxCells: number | null = null;
   @Input() defaultNumCells: number | null = null;
   @Input() defaultVsCpu: boolean = false;
-  maxPlayers = this.defaultMaxPlayers;
-  maxCells = this.defaultMaxCells;
-  numCells = this.defaultNumCells;
-  vsCpu = this.defaultVsCpu;
+  maxPlayers: number | null = null;  // <-- aggiunto
+  maxCells: number | null = null;    // <-- aggiunto
+  numCells: number | null = null;    // <-- aggiunto
+  vsCpu: boolean = false; 
 
 
   constructor(private modalCtrl: ModalController) { }
   confirm() {
+    console.log('Conferma con:', this.maxPlayers, this.maxCells, this.numCells, this.vsCpu); 
     this.modalCtrl.dismiss({
       maxPlayers: this.maxPlayers,
       maxCells: this.maxCells,
       numCells: this.numCells,
-      vsCpu: this.vsCpu
+      vsCpu: this.vsCpu,
     });
+
+    
   }
 
   cancel() {
     this.modalCtrl.dismiss(null);
   }
-  ngOnInit() {}
+  ngOnInit() {
+    this.maxPlayers = this.defaultMaxPlayers;
+    this.maxCells = this.defaultMaxCells;
+    this.numCells = this.defaultNumCells;
+    this.vsCpu = this.defaultVsCpu;
+  }
 
 }
