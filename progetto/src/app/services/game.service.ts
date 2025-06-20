@@ -4,8 +4,8 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  //private API_URL = 'https://api.peppeponte.duckdns.org';
-  private API_URL = 'http://localhost:5000';
+  private API_URL = 'https://api.peppeponte.duckdns.org';
+  //private API_URL = 'http://localhost:5000';
 
   constructor(private http: HttpClient) {}
 
