@@ -18,9 +18,8 @@ import {flameOutline,
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
 })
-export class RulesPage implements OnInit {
+export class RulesPage {
 
-  isLoading: boolean = true;
   isFlippedOca       = false;
   isFlippedPonte     = false;
   isFlippedLocanda   = false;
@@ -42,12 +41,6 @@ export class RulesPage implements OnInit {
       'paw-outline': pawOutline});
   }
 
-  ngOnInit() {
-    // Simula un caricamento di 2 secondi prima di mostrare le regole
-    setTimeout(() => {
-      this.isLoading = false;
-    }, 2000);
-  }
   onHome(){
     this.router.navigateByUrl("/home");
   }

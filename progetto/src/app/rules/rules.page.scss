@@ -9,7 +9,7 @@
 
 /* HOST (sfondo pagina) */
 :host {
-  --background: #e4d0b0; /* panna chiaro */
+  --background: #2b9348;; /* panna chiaro */
   background-color: var(--background);
   color: #975858; /* testo scuro per contrasto */
 }
@@ -17,9 +17,8 @@
 /* TITOLI */
 .title {
   text-align:left;
-  font-family: 'Luckiest Guy', cursive, sans-serif;
   color: #070000;
-  font-size: 26px;
+  font-size: 28px;
 }
 .title-centered {
   display: flex;
@@ -27,74 +26,27 @@
   text-align: center;
 }
 .special {
-  font-family: 'Luckiest Guy', cursive, sans-serif;
   //color: #ff6f00; // Arancione cartoon
   font-size: 26px; // Ancora più grande
   letter-spacing: 6px; // Più spazio tra le lettere
   //margin: 40px 0 32px 0; // Più spazio sopra e sotto
   text-shadow:
-    4px 4px 0 #fff8f0,
-    6px 6px 12px #d6d6d6,
-    0 0 1px #ffb300; // Ombra multipla più marcata
+    4px 4px 0 #070000,
+    6px 6px 12px #070000,
+    0 0 1px #070000; // Ombra multipla più marcata
   background: transparent !important;
-  -webkit-text-stroke: 2px #d9534f; // Bordo rosso più spesso
+  -webkit-text-stroke: 2px #FFFF3F; // Bordo rosso più spesso
 }
 
 .special ion-label {
-  color: #ff6f00;
   font-size: 28px;
-  font-family: 'Luckiest Guy', cursive, sans-serif;
-  letter-spacing: 4px;
 }
 
 ion-card-title {
-  font-family: 'Luckiest Guy', cursive, sans-serif;
   color: #070000;
 }
 
-/* LOADER */
-.loader {
-  --ANIMATION-DELAY-MULTIPLIER: 70ms;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  background-color: white; /* oppure trasparente */
-  padding: 0;
-  margin: 0;
-  overflow: hidden;
-}
-.loader span {
-  padding: 0;
-  margin: 0;
-  letter-spacing: -5rem;
-  animation-delay: 0s;
-  transform: translateY(4rem);
-  animation: hideAndSeek 1s alternate infinite cubic-bezier(0.86, 0, 0.07, 1);
-  color: #a67c52; /* colore testo leggermente marrone chiaro */
-}
-.loader .l { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 0); }
-.loader .o { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 1); }
-.loader .a { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 2); }
-.loader .d { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 3); }
-.loader .ispan { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 4); }
-.loader .n { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 5); }
-.loader .g { animation-delay: calc(var(--ANIMATION-DELAY-MULTIPLIER) * 6); }
-.letter { width: fit-content; height: 3rem; }
-.i { margin-inline: 5px; }
-@keyframes hideAndSeek {
-  0% { transform: translateY(4rem); }
-  100% { transform: translateY(0rem); }
-}
-.loader-container {
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  height: 80vh;
-  color: #a67c52; /* colore coerente con loader */
-}
+
 
 /* LISTE E ITEMS */
 .Rules, .ion-padding {
@@ -233,7 +185,7 @@ ion-card.card {
 
 .back {
   transform: rotateY(180deg);
-  background: #ffffff;
+  background: #fdfcf6;
 }
 
 .card {
@@ -272,7 +224,7 @@ ion-spinner {
 
 /* CONTENUTO */
 ion-content {
-  --background: #e4d0b0 !important; /* panna chiaro */
+  --background: #2b9348 !important; /* panna chiaro */
   background-color: var(--background) !important;
 }
 .ion-padding {
@@ -381,4 +333,29 @@ ion-content {
   .oca-bg-footer {
     width: 70px;
   }
+}
+
+ion-button {
+  --background: #eeef20;
+  --color: black;
+  --border-radius: 8px;
+  --box-shadow: none;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  display:inline-block;
+  margin-top: 2vh;
+  width: auto;
+   z-index: 10;
+  position: relative;
+}
+
+ion-toolbar {
+  --background: #AAcc00; /* stesso della board */
+  --border-radius: 0px;
+  --box-shadow: none;
+  display: flex;
+}
+
+.home{
+  text-align:center;
 }
