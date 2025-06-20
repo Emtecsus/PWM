@@ -1,0 +1,470 @@
+from flask import Flask, request, jsonify
+import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
+import uuid
+import random
+import json
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app, origins=["*"])
+DB = 'database/gioco_dell_oca.db'
+
+# Caselle con penalità (es. perdi un turno o torna indietro di X)
+PENALTY_CELLS = {
+    6: {'type': 'back', 'value': 2},
+    19: {'type': 'back', 'value': 3},
+    31: {'type': 'skip', 'value': 1},
+    52: {'type': 'back', 'value': 4},
+    58: {'type': 'skip', 'value': 1},
+}
+
+
+# Testata e funziona
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data['username']
+    password = generate_password_hash(data['password'])
+    user_id = str(uuid.uuid4())
+
+    try:
+        with sqlite3.connect(DB) as conn:
+            conn.execute("INSERT INTO users (id, username, password) VALUES (?, ?, ?)",
+                         (user_id, username, password))
+        return jsonify({'message': 'User registered successfully'})
+    except sqlite3.IntegrityError:
+        return jsonify({'error': 'Username already exists'}), 400
+
+# Testata e funziona
+
+
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+
+    with sqlite3.connect(DB) as conn:
+        c = conn.cursor()
+        c.execute("SELECT id, password FROM users WHERE username=?", (username,))
+        result = c.fetchone()
+        if result and check_password_hash(result[1], password):
+            return jsonify({'message': 'Login successful', 'user_id': result[0]})
+        return jsonify({'error': 'Invalid credentials'}), 401
+    
+@app.route('/get_username/<user_id>', methods=['GET'])
+def get_username(user_id):
+    conn= sqlite3.connect(DB)
+    c = conn.cursor()
+    c.execute("SELECT username FROM users WHERE id=?", (user_id,))
+    result = c.fetchone()
+    if result:
+        return jsonify({'Username cercato': result[0]}), 200
+    else:
+        return jsonify({'error': f'Nessun utente trovato per ID: {user_id}'}), 404
+
+# @app.route('/set_special_cells', methods=['POST'])
+def set_special_cells(info=None):
+
+    user_id = info['user_id']
+    game_id = info['game_id']
+    
+    if user_id is None or game_id is None:
+        return jsonify({'error': 'UserID e Game ID sono obbligatori'}), 400
+    
+    if info['cells'] is not None:
+        cells = info['cells']
+    else:
+        return jsonify({'error': 'Devi impostare le celle speciali'}), 400
+    
+    PENALTY_CELLS = cells
+
+    print("set special cells")
+    print("cells", cells)
+    print("PENALTY_CELLS", PENALTY_CELLS)
+
+    with sqlite3.connect(DB) as conn:
+        # Verifica che l'utente sia il creatore del gioco
+        c = conn.cursor()
+        c.execute(
+            "SELECT user_id FROM game_players WHERE game_id=? AND is_cpu=0 LIMIT 1", (game_id,))
+        creator = c.fetchone()
+
+        if not creator or creator[0] != user_id:
+            return jsonify({'error': 'Only game creator can set special cells'}), 403
+
+        # Verifica che il gioco sia in stato 'waiting'
+        c.execute("SELECT status FROM games WHERE id=?", (game_id,))
+        status = c.fetchone()[0]
+        if status != 'waiting':
+            return jsonify({'error': 'Special cells can only be set before game starts'}), 400
+
+        # Salva le caselle speciali
+        conn.execute("UPDATE games SET special_cells=? WHERE id=?",
+                     (json.dumps(cells), game_id))
+
+    return jsonify({'message': 'Special cells set successfully'})
+
+
+# @app.route('/generate_random_special_cells', methods=['POST'])
+def generate_random_special_cells(info=None):
+    # data = request.get_json()
+    # game_id = data['game_id']
+    # user_id = data['user_id']
+    
+    game_id = info['game_id']
+    user_id = info['user_id']
+    
+    if user_id is None or game_id is None:
+        return jsonify({'error': 'UserID e Game ID sono obbligatori'}), 400
+    
+    num_cells = info['num_cells']
+
+    # Genera caselle casuali
+    cells = {}
+    positions = random.sample(range(1, 62), num_cells)
+
+    for pos in positions:
+        cell_type = random.choice(['back', 'forward', 'skip'])
+        value = random.randint(1, 3) if cell_type in ['back', 'forward'] else 1
+        cells[pos] = {'type': cell_type, 'value': value}
+
+    print("set special cells")
+    print("cells", cells)
+    print("PENALTY_CELLS", PENALTY_CELLS)
+
+    # Usa la route esistente per salvarle
+    return set_special_cells(info={'game_id': game_id, 'user_id': user_id, 'cells': cells})
+
+
+@app.route('/lista_games/<user_id>', methods=['GET'])
+def all_games(user_id):
+    """
+    Restituisce tutte le partite disponibili (in stato 'waiting') 
+    dove l'utente specificato non è già un giocatore
+    """
+    try:
+        with sqlite3.connect(DB) as conn:
+            conn.row_factory = sqlite3.Row  # Permette accesso alle colonne per nome
+            c = conn.cursor()
+            # Query che cerca partite waiting dove l'utente non è già presente
+            c.execute('''
+                SELECT 
+                    g.id as game_id,
+                    g.status,
+                    g.max_players,
+                    g.player_count as current_players,
+                    (
+                        SELECT u.username 
+                        FROM game_players gp
+                        JOIN users u ON gp.user_id = u.id
+                        WHERE gp.game_id = g.id AND gp.is_cpu = 0
+                        LIMIT 1
+                    ) as creator
+                FROM 
+                    games g
+                WHERE 
+                    g.status = 'waiting'
+                    AND g.player_count < g.max_players
+                    AND NOT EXISTS (
+                        SELECT 1 
+                        FROM game_players gp 
+                        WHERE gp.game_id = g.id AND gp.user_id = ?
+                    )
+            ''', (user_id,))
+            games = []
+            for row in c.fetchall():
+                game = dict(row)
+                # Aggiungi informazioni aggiuntive se necessario
+                games.append(game)
+            
+            return jsonify({
+                'available_games': games,
+                'count': len(games)
+            }), 200
+            
+    except sqlite3.Error as e:
+        return jsonify({
+            'error': 'Database error',
+            'details': str(e)
+        }), 500
+
+
+@app.route('/create_game', methods=['POST'])
+def create_game():
+    data = request.get_json()
+    user_id = data['user_id']
+    vs_cpu = data['vs_cpu']
+    max_players = data.get('max_players', 4)  # valore di default sarà 4 giocatori
+    max_cells = data.get('max_cells', 63)     # numero caselle standard 63 caselle
+    num_cells = data['num_cells'] if 'num_cells' in list(data.keys()) != None else 5  # numero di caselle speciali da generare
+    cells = data['cells'] if 'cells' in list(data.keys()) != None else None
+    game_id = str(uuid.uuid4())
+    if cells:
+        set_special_cells(info={'game_id': game_id, 'user_id': user_id, 'cells': data['cells']})
+    else:
+        generate_random_special_cells(info={'game_id': game_id, 'user_id': user_id, 'num_cells': num_cells})
+    try:
+        with sqlite3.connect(DB) as conn:
+            c = conn.cursor()
+            # Verifico che l'utente esiste
+            c.execute("SELECT 1 FROM users WHERE id=?", (user_id,))
+            if not c.fetchone():
+                return jsonify({'error': 'User not found'}), 404
+            # Creo la partita nel database
+            c.execute('''
+                    INSERT INTO games 
+                    (id, status, current_turn, max_players, max_cells, player_count, special_cells) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
+                ''', (
+                    game_id,
+                    'waiting',    # Stato iniziale
+                    user_id,     # Primo turno al creatore
+                    max_players,
+                    max_cells,
+                    1,           # Inizia con 1 giocatore
+                    json.dumps(PENALTY_CELLS)  # Salva le celle speciali come JSON
+                ))
+            player_count = 1
+            # conn.execute("INSERT INTO games (id, status, current_turn, winner) VALUES (?, ?, ?, ?)",
+            #              (game_id, 'waiting', user_id, None))
+            conn.execute("INSERT INTO game_players (game_id, user_id, position, is_cpu) VALUES (?, ?, ?, ?)",
+                        (game_id, user_id, 0, 0))
+            if vs_cpu:
+                cpu_id = str(uuid.uuid4())
+                conn.execute("INSERT INTO users (id, username, password) VALUES (?, ?, ?)",
+                            (cpu_id, 'CPU_' + cpu_id[:5], ''))
+                conn.execute(
+                    "INSERT INTO game_players (game_id, user_id, position, is_cpu) VALUES (?, ?, ?, ?)", (game_id, cpu_id, 0, 1))
+
+                
+                if player_count + 1 == max_players:
+                    conn.execute(
+                        "UPDATE games SET status = 'ongoing', player_count = ? WHERE id = ?", (player_count + 1, game_id,))
+                else:
+                    conn.execute(
+                        "UPDATE games SET player_count = ? WHERE id = ?", (player_count + 1, game_id,))
+                
+        return jsonify({
+                    'message': 'Game created successfully',
+                    'game_id': game_id,
+                    'status': 'waiting',
+                    'max_players': max_players,
+                    'current_players': 1,
+                    'max_cells': max_cells,
+                    'special_cells': PENALTY_CELLS
+                }), 201
+    except sqlite3.Error as e:
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
+    
+@app.route('/join_game', methods=['POST'])
+def join_game():
+    data = request.get_json()
+    user_id = data['user_id']    
+    with sqlite3.connect(DB) as conn:
+        c = conn.cursor()
+        c.execute('''
+                SELECT 
+                    g.id as game_id,
+                    g.status,
+                    g.max_players,
+                    g.player_count as current_players,
+                    (
+                        SELECT u.username 
+                        FROM game_players gp
+                        JOIN users u ON gp.user_id = u.id
+                        WHERE gp.game_id = g.id AND gp.is_cpu = 0
+                        LIMIT 1
+                    ) as creator
+                FROM 
+                    games g
+                WHERE 
+                    g.status = 'waiting'
+                    AND g.player_count < g.max_players
+                    AND NOT EXISTS (
+                        SELECT 1 
+                        FROM game_players gp 
+                        WHERE gp.game_id = g.id AND gp.user_id = ?
+                    )
+            ''', (user_id,))
+        game = c.fetchone()   
+        if game:
+            game_id = game[0]
+            status = game[1]
+            max_players = game[2]
+            current_players = game[3]
+            print("join game", game_id, user_id, status, current_players, max_players)
+            
+            if current_players +1 == max_players:
+                conn.execute("""
+                             UPDATE games 
+                             SET status='ongoing',
+                             player_count= ?
+                             WHERE id=?
+                             """, (current_players+1, game_id,))
+            else:
+                conn.execute("""
+                             UPDATE games 
+                             SET player_count= ?
+                             WHERE id=?
+                             """, (current_players + 1, game_id))
+            
+            c.execute("INSERT INTO game_players (game_id, user_id, position, is_cpu) VALUES (?, ?, ?, ?)",
+                         (game_id, user_id, 0, 0))
+            return jsonify({'message': 'Joined game', 'game_id': game_id})
+            
+            
+            
+            
+        return jsonify({'error': 'Non ci sono partite disponibili'}), 404
+
+
+@app.route('/roll_dice', methods=['POST'])
+def roll_dice():
+    data = request.get_json()
+    user_id = data['user_id']
+    game_id = data['game_id']
+    dice = random.randint(1, 6)
+
+    with sqlite3.connect(DB) as conn:
+        
+        
+        
+        # Check if game exists and is ongoing
+        c = conn.cursor()
+        c.execute("SELECT * FROM games WHERE id=? AND status='finished' ", (game_id,))
+        finished = c.fetchone()
+        if finished:
+            return jsonify({'error': 'Game already finished'}), 400
+        
+        c = conn.cursor()
+        c.execute("SELECT current_turn FROM games WHERE id=?", (game_id,))
+        current_turn = c.fetchone()
+        if not current_turn or current_turn[0] != user_id:
+            return jsonify({'error': 'Not your turn'}), 403
+        
+        c.execute("SELECT max_cells FROM games WHERE id=?", (game_id,))
+        max_cells = c.fetchone()[0]
+        
+        print(max_cells)
+
+        # Check if player must skip turn
+        c.execute(
+            "SELECT position, skip_turn FROM game_players WHERE game_id=? AND user_id=?", (game_id, user_id))
+        row = c.fetchone()
+        pos, skip = row
+        if skip:
+            conn.execute(
+                "UPDATE game_players SET skip_turn=0 WHERE game_id=? AND user_id=?", (game_id, user_id))
+            # advance turn anyway
+            c.execute(
+                "SELECT user_id FROM game_players WHERE game_id=?", (game_id,))
+            players = [row[0] for row in c.fetchall()]
+            next_index = (players.index(user_id) + 1) % len(players)
+            next_turn = players[next_index]
+            conn.execute(
+                "UPDATE games SET current_turn=? WHERE id=?", (next_turn, game_id))
+            return jsonify({'message': 'Turn skipped due to penalty'})
+
+        new_pos = pos + dice
+
+        # Check penalty
+        if new_pos in PENALTY_CELLS:
+            penalty = PENALTY_CELLS[new_pos]
+            if penalty['type'] == 'back':
+                new_pos = max(0, new_pos - penalty['value'])
+            elif penalty['type'] == 'skip':
+                conn.execute(
+                    "UPDATE game_players SET skip_turn=1 WHERE game_id=? AND user_id=?", (game_id, user_id))
+
+        if new_pos > max_cells:
+            
+            new_pos = max_cells - (new_pos - max_cells)
+            conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
+                     (new_pos, game_id, user_id))
+        elif new_pos == max_cells:
+            conn.execute(
+                "UPDATE games SET status='finished', winner=? WHERE id=?", (user_id, game_id))
+        else:
+            conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
+                         (new_pos, game_id, user_id))
+
+        # Determine next turn
+        c.execute("SELECT user_id FROM game_players WHERE game_id=?", (game_id,))
+        players = [row[0] for row in c.fetchall()]
+        next_index = (players.index(user_id) + 1) % len(players)
+        next_turn = players[next_index]
+        conn.execute("UPDATE games SET current_turn=? WHERE id=?",
+                     (next_turn, game_id))
+
+    return jsonify({'message': 'Dice rolled', 'dice': dice, 'new_position': new_pos})
+
+
+@app.route('/game_state/<game_id>', methods=['GET'])
+def game_state(game_id):
+    with sqlite3.connect(DB) as conn:
+        c = conn.cursor()
+        c.execute("SELECT * FROM games WHERE id=?", (game_id,))
+        game = c.fetchone()
+        
+        print(game)
+        
+        if not game:
+            return jsonify({'error': 'Game not found'}), 404
+
+        c.execute(
+            "SELECT user_id, position, is_cpu, skip_turn FROM game_players WHERE game_id=?", (game_id,))
+        players = [{'user_id': row[0], 'position': row[1], 'is_cpu': bool(
+            row[2]), 'skip_turn': bool(row[3])} for row in c.fetchall()]
+        
+        
+
+        return jsonify({
+            'game': {
+                'id': game[0],
+                'status': game[1],
+                'current_turn': game[2],
+                'winner': game[3],
+                'players': players,
+                "special_cells": json.loads(game[-4]) if game[-4] else {},
+                "max_cells": game[-1],
+            }
+        })
+
+@app.route('/my_games/<user_id>', methods=['GET'])
+def my_games(user_id):
+    try:
+        with sqlite3.connect(DB) as conn:
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+            c.execute('''
+                SELECT 
+                    g.id as game_id,
+                    g.player_count as current_players,
+                    g.max_players
+                FROM 
+                    games g
+                JOIN 
+                    game_players gp ON g.id = gp.game_id
+                WHERE 
+                    gp.user_id = ?
+                    AND g.status != 'finished'
+            ''', (user_id,))
+            
+            games = [
+                {
+                    'game_id': row['game_id'],
+                    'current_players': row['current_players'],
+                    'max_players': row['max_players']
+                } for row in c.fetchall()
+            ]
+            return jsonify({'joined_games': games, 'count': len(games)}), 200
+
+    except sqlite3.Error as e:
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
+
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', debug=True, port=5000)

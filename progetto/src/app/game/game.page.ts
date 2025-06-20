@@ -14,12 +14,14 @@ import { Router } from '@angular/router';
 export class GamePage implements OnInit {
   private pollingInterval: any;
   constructor(public router:Router) {}
+  //private API_URL = 'https://api.peppeponte.duckdns.org';
+  private API_URL = 'http://localhost:5000';
   
   gridSize = 8;
   board: number[][] = [];
   players: any[] = [];
 
-  gameId: string = localStorage.getItem('game_id') || ''; // TODO imposta dinamicamente
+  gameId: string = localStorage.getItem('game_id') || '';
   userId: string = localStorage.getItem('token') || '';
   winnerUsername: string | null = null;
   gameFinished: boolean = false;
@@ -35,7 +37,7 @@ export class GamePage implements OnInit {
   currentTurnUsername: string = '';
   // Funzione per ottenere lo username via ID (verifica se è già nel file)
   async getUsernameById(userId: string): Promise<string> {
-    const response = await fetch(`https://api.peppeponte.duckdns.org/get_username/${userId}`);
+    const response = await fetch(`${this.API_URL}/get_username/${userId}`);
     const data = await response.json();
     return data['Username cercato'] || 'Sconosciuto';
   }
@@ -57,7 +59,7 @@ export class GamePage implements OnInit {
     if (saved) this.selectedPawn = saved;
     const userId = localStorage.getItem('token');
     if (userId) {
-      fetch(`https://api.peppeponte.duckdns.org/get_username/${userId}`)
+      fetch(`${this.API_URL}/get_username/${userId}`)
         .then(res => res.json())
         .then(data => {
           this.myUsername = data['Username cercato'];
@@ -114,7 +116,7 @@ export class GamePage implements OnInit {
   rollDice(userIdOverride?: string) {
     const userId = userIdOverride || this.userId;
 
-    fetch('https://api.peppeponte.duckdns.org/roll_dice', {
+    fetch('http://localhost:5000/roll_dice', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ user_id: userId, game_id: this.gameId })
@@ -141,7 +143,7 @@ export class GamePage implements OnInit {
 
 
   async updateGameState() {
-    const res = await fetch(`https://api.peppeponte.duckdns.org/game_state/${this.gameId}`);
+    const res = await fetch(`${this.API_URL}/game_state/${this.gameId}`);
     const data = await res.json();
     const game = data.game;
 
@@ -166,7 +168,10 @@ export class GamePage implements OnInit {
       setTimeout(() => this.rollDice(currentTurn), 1000);
     }
   }
-
+  goHome(){
+    localStorage.removeItem('game_id')
+    return this.router.navigateByUrl('/home')
+  }
   ngOnDestroy() {
     clearInterval(this.pollingInterval);
   }

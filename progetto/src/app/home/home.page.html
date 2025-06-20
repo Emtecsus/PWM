@@ -5,7 +5,6 @@
       <img src="assets/imgs/goose_classy2_inverted.png" alt="Logo inverted" class="logo_inverted" />
       <div class="rules">
         <ion-button (click)="onRules()">Regole</ion-button>
-        <ion-button slot="end" [disabled]="canJoinOrCreate" *ngIf="!canJoinOrCreate" (click)="router.navigateByUrl('/game')">Riprendi la partita</ion-button>
         <ion-button slot="end" (click)="onLogout()">Esci</ion-button>
       </div>
     </ion-toolbar>
@@ -26,7 +25,6 @@
             <ion-button
               size="small"
               color="success"
-              [disabled]="!canJoinOrCreate"
               (click)="joinGame(game.game_id)">
               Entra
             </ion-button>
@@ -36,6 +34,30 @@
           Nessuna partita disponibile al momento.
         </ion-text>
       </div>
+
+      <!-- MIE PARTITE -->
+      <div class="game-list full-height">
+        <h3>Le mie partite in corso</h3>
+        <ion-list *ngIf="myGames.length > 0">
+          <ion-item *ngFor="let game of myGames">
+            <ion-label>
+              Partita: {{ game.current_players }}/{{ game.max_players }}<br />
+              <small>ID: {{ game.game_id }}</small>
+            </ion-label>
+
+            <ion-button
+              size="small"
+              color="warning"
+              (click)="resumeGame(game.game_id)">
+              Riprendi
+            </ion-button>
+          </ion-item>
+        </ion-list>
+        <ion-text color="medium" *ngIf="myGames.length === 0">
+          Nessuna partita in corso.
+        </ion-text>
+      </div>
+
 
       <!-- TABELLA DI GIOCO -->
       <div class="board-container full-height">
@@ -55,14 +77,8 @@
 
     <!-- PULSANTE GIOCA -->
     <div class="play">
-      <ion-button expand="block" [disabled]="!canJoinOrCreate" (click)="settingsOpen = true">GIOCA</ion-button>
+      <ion-button expand="block" (click)="settingsOpen = true">GIOCA</ion-button>
     </div>
-
-    <ion-card>
-      <ion-text class="errore" color="danger" *ngIf="!canJoinOrCreate">
-        Hai già una partita in corso. Termina prima quella.
-      </ion-text>
-    </ion-card>
 
     <!-- MODALE IMPOSTAZIONI -->
     <ion-modal

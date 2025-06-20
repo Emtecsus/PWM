@@ -23,8 +23,8 @@ export class HomePage {
   maxCells: number | null = null;
   numCells: number | null = null;
   vsCpu: boolean = false;
-  canJoinOrCreate = true;
   availableGames: any[] = [];
+  myGames: any[] = [];
   gamesPollingInterval: any;
   constructor(private menu: MenuController,public router: Router,private authService: AuthService,private gameService: GameService, private modalCtrl: ModalController) {}
    gridSize = 8;
@@ -32,12 +32,18 @@ export class HomePage {
 
   async ngOnInit() {
     this.generateSpiralBoard();
-    const storedGameId = localStorage.getItem('game_id');
-    this.canJoinOrCreate = await this.gameService.checkCanCreate(storedGameId || '');
-    if (this.canJoinOrCreate) {
     this.fetchAvailableGames();
+    this.gameService.getMyGames(localStorage.getItem('token') || '').subscribe({
+      next: (res) => {
+        this.myGames = res.joined_games;
+      },
+      error: (err) => {
+        console.error('Errore nel caricamento delle mie partite:', err);
+        this.myGames = [];
+      }
+    });
+
     this.startGameListPolling();
-    }
   
   }
     stopGameListPolling() {
@@ -177,9 +183,17 @@ fetchAvailableGames() {
       }
     });
   }
-
+  resumeGame(gameId: string){
+    const userId = localStorage.getItem('token');
+    localStorage.removeItem('game_id');
+    if (!userId) return;
+    localStorage.setItem('game_id', gameId);
+    this.stopGameListPolling();
+    this.router.navigateByUrl('/game');
+  }
   joinGame(gameId: string) {
     const userId = localStorage.getItem('token');
+    localStorage.removeItem('game_id');
     if (!userId) return;
     this.gameService.joinGame(userId).subscribe({
       next: (res) => {

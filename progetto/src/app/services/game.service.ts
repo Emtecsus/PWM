@@ -4,7 +4,8 @@ import { Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class GameService {
-  private API_URL = 'https://api.peppeponte.duckdns.org';
+  //private API_URL = 'https://api.peppeponte.duckdns.org';
+  private API_URL = 'http://localhost:5000';
 
   constructor(private http: HttpClient) {}
 
@@ -15,7 +16,7 @@ export class GameService {
       ...options
     });
   }
-  async checkCanCreate(gameId: string): Promise<boolean> {
+  /*async checkCanCreate(gameId: string): Promise<boolean> {
     if (!gameId) return true;
 
     try {
@@ -31,7 +32,7 @@ export class GameService {
       console.error('Errore:', err);
       return true; // fallback: permetti creazione
     }
-  }
+  }*/
   listGames(userId: string) {
     return this.http.get<any>(`${this.API_URL}/lista_games/${userId}`);
   }
@@ -39,6 +40,10 @@ export class GameService {
   joinGame(userId: string) {
     return this.http.post<any>(`${this.API_URL}/join_game`, { user_id: userId });
   }
+  getMyGames(userId: string): Observable<any> {
+    return this.http.get(`${this.API_URL}/my_games/${userId}`);
+  }
+
 
 
 }
