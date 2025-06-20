@@ -327,94 +327,89 @@ def roll_dice():
     dice = random.randint(1, 6)
 
     with sqlite3.connect(DB) as conn:
-        
-        
-        
-        # Check if game exists and is ongoing
         c = conn.cursor()
-        c.execute("SELECT * FROM games WHERE id=? AND status='finished' ", (game_id,))
+
+        # Check if game is finished
+        c.execute("SELECT * FROM games WHERE id=? AND status='finished'", (game_id,))
         finished = c.fetchone()
         if finished:
             return jsonify({'error': 'Game already finished'}), 400
-        
-        c = conn.cursor()
+        # Check if game is waiting
+        c.execute("SELECT * FROM games WHERE id=? AND status='waiting'", (game_id,))
+        waiting = c.fetchone()
+        if waiting:
+            return jsonify({'error': 'Game is waiting'}), 400
+
+        # Check current turn
         c.execute("SELECT current_turn FROM games WHERE id=?", (game_id,))
         current_turn = c.fetchone()
         if not current_turn or current_turn[0] != user_id:
             return jsonify({'error': 'Not your turn'}), 403
-        
+
+        # Get max cells
         c.execute("SELECT max_cells FROM games WHERE id=?", (game_id,))
         max_cells = c.fetchone()[0]
-        
-        print(max_cells)
 
-        # Check if player must skip turn
-        c.execute(
-            "SELECT position, skip_turn FROM game_players WHERE game_id=? AND user_id=?", (game_id, user_id))
+        # Get player position and skip_turn
+        c.execute("SELECT position, skip_turn FROM game_players WHERE game_id=? AND user_id=?", (game_id, user_id))
         row = c.fetchone()
         pos, skip = row
+
+        # Handle skip turn
         if skip:
-            conn.execute(
-                "UPDATE game_players SET skip_turn=0 WHERE game_id=? AND user_id=?", (game_id, user_id))
-            # advance turn anyway
-            c.execute(
-                "SELECT user_id FROM game_players WHERE game_id=?", (game_id,))
-            players = [row[0] for row in c.fetchall()]
-            next_index = (players.index(user_id) + 1) % len(players)
-            next_turn = players[next_index]
-            conn.execute(
-                "UPDATE games SET current_turn=? WHERE id=?", (next_turn, game_id))
-            return jsonify({'message': 'Turn skipped due to penalty'})
-
-        new_pos = pos + dice
-
-    # Aggiorna posizione dopo lancio del dado
-    conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
-                (new_pos, game_id, user_id))
-
-    # Controllo penalità
-    if new_pos in PENALTY_CELLS:
-        penalty = PENALTY_CELLS[new_pos]
-        if penalty['type'] == 'back':
-            back_value = penalty['value']
-            back_pos = max(0, new_pos - back_value)
-            # Aggiorna la posizione effettiva dopo il back
-            conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
-                        (back_pos, game_id, user_id))
-            
-            # Avanza turno
+            conn.execute("UPDATE game_players SET skip_turn=0 WHERE game_id=? AND user_id=?", (game_id, user_id))
+            # Advance turn
             c.execute("SELECT user_id FROM game_players WHERE game_id=?", (game_id,))
             players = [row[0] for row in c.fetchall()]
             next_index = (players.index(user_id) + 1) % len(players)
             next_turn = players[next_index]
             conn.execute("UPDATE games SET current_turn=? WHERE id=?", (next_turn, game_id))
+            return jsonify({'message': 'Turn skipped due to penalty'})
 
-            return jsonify({
-                'back': back_value,
-                'dice': dice,
-                'new_position': back_pos
-            })
-        elif penalty['type'] == 'skip':
-            conn.execute("UPDATE game_players SET skip_turn=1 WHERE game_id=? AND user_id=?",
-                        (game_id, user_id))
+        # Roll and update position
+        new_pos = pos + dice
+        conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
+                     (new_pos, game_id, user_id))
 
+        # Check for penalty after move
+        if new_pos in PENALTY_CELLS:
+            penalty = PENALTY_CELLS[new_pos]
+            if penalty['type'] == 'back':
+                back_value = penalty['value']
+                back_pos = max(0, new_pos - back_value)
+                conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
+                             (back_pos, game_id, user_id))
+
+                # Advance turn
+                c.execute("SELECT user_id FROM game_players WHERE game_id=?", (game_id,))
+                players = [row[0] for row in c.fetchall()]
+                next_index = (players.index(user_id) + 1) % len(players)
+                next_turn = players[next_index]
+                conn.execute("UPDATE games SET current_turn=? WHERE id=?", (next_turn, game_id))
+
+                return jsonify({
+                    'back': back_value,
+                    'dice': dice,
+                    'new_position': back_pos
+                })
+            elif penalty['type'] == 'skip':
+                conn.execute("UPDATE game_players SET skip_turn=1 WHERE game_id=? AND user_id=?",
+                             (game_id, user_id))
+
+        # Check win condition
         if new_pos > max_cells:
-            
             new_pos = max_cells - (new_pos - max_cells)
             conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
-                     (new_pos, game_id, user_id))
+                         (new_pos, game_id, user_id))
         elif new_pos == max_cells:
-            conn.execute(
-                "UPDATE games SET status='finished', winner=? WHERE id=?", (user_id, game_id))
-            return jsonify({ # Modificato 
+            conn.execute("UPDATE games SET status='finished', winner=? WHERE id=?",
+                         (user_id, game_id))
+            return jsonify({
                 'dice': dice,
                 'new_position': new_pos
             })
-        else:
-            conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
-                         (new_pos, game_id, user_id))
 
-        # Determine next turn
+        # Advance turn
         c.execute("SELECT user_id FROM game_players WHERE game_id=?", (game_id,))
         players = [row[0] for row in c.fetchall()]
         next_index = (players.index(user_id) + 1) % len(players)
@@ -422,7 +417,12 @@ def roll_dice():
         conn.execute("UPDATE games SET current_turn=? WHERE id=?",
                      (next_turn, game_id))
 
-    return jsonify({'message': 'Dice rolled', 'dice': dice, 'new_position': new_pos})
+    return jsonify({
+        'message': 'Dice rolled',
+        'dice': dice,
+        'new_position': new_pos
+    })
+
 
 
 @app.route('/game_state/<game_id>', methods=['GET'])
