@@ -22,21 +22,8 @@ export class GameSettingsModalComponent  implements OnInit {
 
 
   constructor(private modalCtrl: ModalController) { }
-  confirm() {
-    console.log('Conferma con:', this.maxPlayers, this.maxCells, this.numCells, this.vsCpu); 
-    this.modalCtrl.dismiss({
-      maxPlayers: this.maxPlayers,
-      maxCells: this.maxCells,
-      numCells: this.numCells,
-      vsCpu: this.vsCpu,
-    });
+  
 
-    
-  }
-
-  cancel() {
-    this.modalCtrl.dismiss(null);
-  }
   ngOnInit() {
     this.maxPlayers = this.defaultMaxPlayers;
     this.maxCells = this.defaultMaxCells;

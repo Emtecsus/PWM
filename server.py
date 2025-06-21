@@ -318,7 +318,7 @@ def join_game():
         return jsonify({'message': 'Joined game', 'game_id': game_id}), 200
 
 
-
+# Modificata Logica per il waiting, modificata logica delle caselle "back",aggiunto un ritorno per quando si vince (non funziona come previsto)
 @app.route('/roll_dice', methods=['POST'])
 def roll_dice():
     data = request.get_json()
@@ -334,7 +334,7 @@ def roll_dice():
         finished = c.fetchone()
         if finished:
             return jsonify({'error': 'Game already finished'}), 400
-        # Check if game is waiting
+        # Check if game is waiting aggiunta flavio
         c.execute("SELECT * FROM games WHERE id=? AND status='waiting'", (game_id,))
         waiting = c.fetchone()
         if waiting:
