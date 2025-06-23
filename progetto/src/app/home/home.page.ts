@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { MenuController } from '@ionic/angular';
-import {IonicModule } from '@ionic/angular';
-import { Router } from '@angular/router';
+import { IonicModule } from '@ionic/angular';
+import { Router, ActivatedRoute } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { GameService } from '../services/game.service';
@@ -26,13 +26,26 @@ export class HomePage {
   availableGames: any[] = [];
   myGames: any[] = [];
   gamesPollingInterval: any;
-  constructor(private menu: MenuController,public router: Router,private authService: AuthService,private gameService: GameService, private modalCtrl: ModalController) {}
+  constructor(
+    private menu: MenuController,
+    public router: Router,
+    private authService: AuthService,
+    private gameService: GameService, 
+    private modalCtrl: ModalController,
+    private cdr: ChangeDetectorRef,
+    private route: ActivatedRoute
+  ) {}
    gridSize = 8;
   board: number[][] = [];
 
   async ngOnInit() {
     this.generateSpiralBoard();
-    this.startGameListPolling();
+
+    // Ascolta i cambiamenti dei parametri della route
+    this.route.params.subscribe(_ => {
+      this.stopGameListPolling(); // Ferma eventuali polling precedenti
+      this.startGameListPolling(); // Riavvia il polling ogni volta che torni su /home
+    });
   
   }
 
@@ -136,7 +149,9 @@ export class HomePage {
       next: (res) => {
         localStorage.setItem('game_id', res.game_id);
         this.stopGameListPolling();
-        this.router.navigateByUrl('/game');
+        this.router.navigateByUrl('/game').then(() => {
+          this.cdr.detectChanges(); // Forza il rilevamento dei cambiamenti
+        });
       },
       error: (err) => {
         console.error('Errore nella creazione partita:', err);
@@ -186,7 +201,9 @@ export class HomePage {
     if (!userId) return;
     localStorage.setItem('game_id', gameId);
     this.stopGameListPolling();
-    this.router.navigateByUrl('/game');
+    this.router.navigateByUrl('/game').then(() => {
+      this.cdr.detectChanges(); // Forza il rilevamento dei cambiamenti
+    });
   }
 
   joinGame(gameId: string) {
@@ -197,13 +214,18 @@ export class HomePage {
       next: (res) => {
         localStorage.setItem('game_id', res.game_id);
         this.stopGameListPolling();
-        this.router.navigateByUrl('/game');
+        this.router.navigateByUrl('/game').then(() => {
+          this.cdr.detectChanges(); // Forza il rilevamento dei cambiamenti
+        });
       },
       error: (err) => {
         console.error('Errore nel join:', err);
         alert('Errore durante il join della partita');
       }
     });
+  }
+  ngOnDestroy() {
+    this.stopGameListPolling();
   }
 }
 

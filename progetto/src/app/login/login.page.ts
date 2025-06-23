@@ -1,10 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
-
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
@@ -18,7 +17,8 @@ export class LoginPage {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
       username: ['', Validators.required],
@@ -42,7 +42,9 @@ onForgotPassword() {
     this.authService.login(username, password).subscribe({
       next: (res) => {
         localStorage.setItem('token', res.user_id);
-        this.router.navigateByUrl('/home');
+        this.router.navigateByUrl('/home').then(() => {
+          this.cdr.detectChanges(); // Forza il rilevamento dei cambiamenti
+        });
       },
       error: (err) => {
         console.error(err);

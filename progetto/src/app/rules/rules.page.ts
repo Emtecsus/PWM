@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
@@ -25,14 +25,8 @@ export class RulesPage {
   isFlippedLocanda   = false;
   isFlippedPrigione  = false;
   isFlippedMorte     = false;
-  
-  /*rules = [
-    { title: 'Regola 1', description: 'Descrizione della regola 1.' },
-    { title: 'Regola 2', description: 'Descrizione della regola 2.' },
-    { title: 'Regola 3', description: 'Descrizione della regola 3.' },
-  ];
-*/
-  constructor(private router: Router) {
+
+  constructor(private router: Router, private cdr: ChangeDetectorRef) {
     addIcons({'flame-outline': flameOutline,
       'walk-outline': walkOutline,
       'bed-outline': bedOutline,
@@ -42,7 +36,9 @@ export class RulesPage {
   }
 
   onHome(){
-    this.router.navigateByUrl("/home");
+    this.router.navigateByUrl("/home").then(() => {
+      this.cdr.detectChanges(); // Forza il rilevamento dei cambiamenti
+    });
   }
 
 }

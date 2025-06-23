@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -15,7 +15,7 @@ import { firstValueFrom } from 'rxjs';
 export class GamePage implements OnInit {
   isLoading: boolean = true;
   private pollingInterval: any;
-  constructor(public router:Router, private gameService: GameService) {}
+  constructor(public router:Router, private gameService: GameService, private cdr: ChangeDetectorRef) {}
   gridSize = 8;
   board: number[][] = [];
   players: any[] = [];
@@ -195,10 +195,12 @@ export class GamePage implements OnInit {
   }
 
 
-  goHome(){
-    localStorage.removeItem('game_id')
-    return this.router.navigateByUrl('/home')
+  goHome() {
+    localStorage.removeItem('game_id');
+    this.router.navigate(['/home']);
   }
+
+
   ngOnDestroy() {
     clearInterval(this.pollingInterval);
   }
