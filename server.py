@@ -65,7 +65,7 @@ def get_username(user_id):
         return jsonify({'error': f'Nessun utente trovato per ID: {user_id}'}), 404
 
 # @app.route('/set_special_cells', methods=['POST'])
-def set_special_cells(info=None):
+def set_special_cells(info=None): # non usata si potrebbe togliere
     user_id = info['user_id']
     game_id = info['game_id']
     
@@ -103,7 +103,9 @@ def set_special_cells(info=None):
 
 
 # @app.route('/generate_random_special_cells', methods=['POST'])
-def generate_random_special_cells(info=None):
+def generate_random_special_cells(info=None): 
+# cambiata per generare solo back e skip ed inoltre ritorna il dizionario cells al posto di usare set_special_cells
+# siccome in create_game si passano comunque al db le celle speciali
     game_id = info['game_id']
     user_id = info['user_id']
     
@@ -127,7 +129,7 @@ def generate_random_special_cells(info=None):
 
 
 
-
+# Aggiunta da noi
 @app.route('/lista_games/<user_id>', methods=['GET'])
 def all_games(user_id):
     """
@@ -180,16 +182,16 @@ def all_games(user_id):
             'details': str(e)
         }), 500
 
-
+# Cambiata in modo tale che si possano generare le caselle in modo casuale, deprecate le caselle di default PENALTY_CELLS
 @app.route('/create_game', methods=['POST'])
 def create_game():
     data = request.get_json()
     user_id = data['user_id']
     vs_cpu = data['vs_cpu']
     max_players = data.get('max_players', 4)  # valore di default sarà 4 giocatori
-    max_cells = data.get('max_cells', 63)     # numero caselle standard 63 caselle
+    max_cells = data.get('max_cells', 63)     # non usato perchè non necessario
     num_cells = data['num_cells'] if 'num_cells' in list(data.keys()) != None else 5  # numero di caselle speciali da generare
-    cells = data['cells'] if 'cells' in list(data.keys()) != None else None
+    cells = data['cells'] if 'cells' in list(data.keys()) != None else None # non usato perchè non necessario
     game_id = str(uuid.uuid4())
 
     # Se le celle non sono fornite, generiamo celle casuali
@@ -247,7 +249,7 @@ def create_game():
             'max_players': max_players,
             'current_players': 1,
             'max_cells': max_cells,
-            'special_cells': special_cells  # Invia le celle speciali generate
+            'special_cells': special_cells  # Mostra le celle speciali generate
         }), 201
     except sqlite3.Error as e:
         return jsonify({'error': 'Database error', 'details': str(e)}), 500
@@ -313,6 +315,7 @@ def join_game():
 
 
 # Modificata Logica per il waiting, modificata logica delle caselle "back",aggiunto un ritorno per quando si vince (non funziona come previsto)
+# Cambiata logica di confronto tra caselle del db e new_pos
 @app.route('/roll_dice', methods=['POST'])
 def roll_dice():
     data = request.get_json()
