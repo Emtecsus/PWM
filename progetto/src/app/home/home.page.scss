@@ -179,8 +179,56 @@ ion-card {
 
 @media screen and (max-width: 768px) {
   .main-content {
-    flex-direction: column;
+    flex-direction: column; /* Imposta la direzione in colonna */
+    align-items: center; /* Centra gli elementi orizzontalmente */
+    justify-content: center; /* Centra gli elementi verticalmente */
+    padding: 16px;
+    width: 100%;
+    text-align: center; /* Allinea il contenuto al centro */
+  }
+
+  /* Lista delle partite - centrato e larghezza massima */
+  .game-list {
+    width: 100%;
+    max-width: 400px; /* Limita la larghezza delle liste */
+    margin: 0 auto;
+    margin-top: 16px;
+  }
+
+  /* Griglia di gioco - ridurre il numero di colonne su schermi piccoli */
+  .grid {
+    gap: 8px; /* Aggiungi un po' di spazio tra le celle */
+    width: 90vw; /* Imposta la larghezza al 90% della finestra */
+    aspect-ratio: 1; /* Mantieni il rapporto quadrato */
+    margin: 0 auto; /* Centra la griglia */
+  }
+
+  /* Modifica la dimensione del testo nelle celle */
+  .cell {
+    font-size: 12px; /* Riduci la dimensione del testo */
+  }
+
+  /* Pulsante "GIOCA" - larghezza del 80% per mobile */
+  .play {
+    width: 100%;
+    display: flex;
+    justify-content: center;
     align-items: center;
+    padding: 16px;
+  }
+
+  /* Centratura del contenitore principale */
+  .board-container {
+    width: 100%;
+    max-width: 500px;
+    margin: 16px auto; /* Centra la board */
+  }
+
+  /* Centratura e larghezza massima per la barra laterale delle partite */
+  .game-list {
+    max-width: 400px;
+    width: 100%;
+    margin: 16px auto;
   }
 }
 

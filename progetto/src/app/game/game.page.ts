@@ -48,11 +48,11 @@ export class GamePage implements OnInit {
 
 
   selectPawn(pawnName: string) {
-    this.selectedPawn = pawnName;
-    localStorage.setItem('pawn_' + this.userId, pawnName);
-    this.showPawnSelector = false;
+    this.selectedPawn = pawnName;  // Cambia la pedina selezionata
+    localStorage.setItem('pawn_' + this.userId, pawnName);  // Salva la nuova pedina nel localStorage per il giocatore corrente
+    this.showPawnSelector = false;  // Chiudi il selettore delle pedine
   }
-
+  
   togglePawnSelector() {
     this.showPawnSelector = !this.showPawnSelector;
   }
@@ -60,11 +60,24 @@ export class GamePage implements OnInit {
   ngOnInit() {
     this.gameId=localStorage.getItem('game_id') || '';
     this.generateSpiralBoard();
+    // Schermata di loading
     setTimeout(() => {
       this.isLoading = false;
-    }, 2000);
-    const saved = localStorage.getItem('pawn_' + this.userId);
-    if (saved) this.selectedPawn = saved;
+    }, 2000)
+
+    // Per ogni giocatore, assegna una pedina unica se non l'ha già scelta
+    this.players.forEach((player, index) => {
+      // Recupera la pedina dal localStorage per ogni giocatore
+      let savedPawn = localStorage.getItem('pawn_' + player.user_id);
+
+      if (!savedPawn) {
+        // Assegna una pedina unica in base all'ordine dei giocatori
+        savedPawn = this.availablePawns[index];  // Usa l'indice per scegliere una pedina unica
+        localStorage.setItem('pawn_' + player.user_id, savedPawn);  // Salva la pedina nel localStorage per il giocatore
+      }
+
+      player.pawn = savedPawn;  // Assegna la pedina al giocatore
+    });
     if (this.userId) {
       this.gameService.getUsernameById(this.userId).subscribe({
         next: (res) => {
@@ -75,6 +88,7 @@ export class GamePage implements OnInit {
           this.myUsername = 'Sconosciuto';
         }
       });
+
     }
     this.updateGameState();
     this.startPollingGameState();
@@ -110,13 +124,22 @@ export class GamePage implements OnInit {
   }
 
   getPawnImage(userId: string): string {
+    // Recupera la pedina salvata nel localStorage per il giocatore corrente
+    const savedPawn = localStorage.getItem('pawn_' + userId);
+    if (savedPawn) {
+      return 'assets/imgs/' + savedPawn;  // Restituisce l'immagine della pedina del giocatore
+    }
+
+    // Se non è stata salvata una pedina, assegna una pedina predefinita
     const index = this.players.findIndex(p => p.user_id === userId);
     if (index >= 0 && index < this.availablePawns.length) {
-      return 'assets/imgs/' + this.availablePawns[index];
+      return 'assets/imgs/' + this.availablePawns[index];  // Assegna una pedina predefinita
     }
-    // fallback
-    return 'assets/imgs/goose_musc.png';
+
+    // Fallback
+    return 'assets/imgs/goose_musc.png';  // Pedina di fallback
   }
+
 
   rollDice(userIdOverride?: string) {
     const userId = userIdOverride || this.userId;
