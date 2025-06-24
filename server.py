@@ -66,7 +66,6 @@ def get_username(user_id):
 
 # @app.route('/set_special_cells', methods=['POST'])
 def set_special_cells(info=None):
-
     user_id = info['user_id']
     game_id = info['game_id']
     
@@ -75,14 +74,10 @@ def set_special_cells(info=None):
     
     if info['cells'] is not None:
         cells = info['cells']
+        global gen_cells
+        gen_cells = cells  # Salva le celle speciali nella variabile globale
     else:
         return jsonify({'error': 'Devi impostare le celle speciali'}), 400
-    
-    PENALTY_CELLS = cells
-
-    print("set special cells")
-    print("cells", cells)
-    print("PENALTY_CELLS", PENALTY_CELLS)
 
     with sqlite3.connect(DB) as conn:
         # Verifica che l'utente sia il creatore del gioco
@@ -109,10 +104,6 @@ def set_special_cells(info=None):
 
 # @app.route('/generate_random_special_cells', methods=['POST'])
 def generate_random_special_cells(info=None):
-    # data = request.get_json()
-    # game_id = data['game_id']
-    # user_id = data['user_id']
-    
     game_id = info['game_id']
     user_id = info['user_id']
     
@@ -126,16 +117,15 @@ def generate_random_special_cells(info=None):
     positions = random.sample(range(1, 62), num_cells)
 
     for pos in positions:
-        cell_type = random.choice(['back', 'forward', 'skip'])
-        value = random.randint(1, 3) if cell_type in ['back', 'forward'] else 1
+        # Solo 'back' o 'skip' come tipo di casella
+        cell_type = random.choice(['back', 'skip'])
+        value = random.randint(1, 3) if cell_type == 'back' else 1  # 'back' avrà un valore random da 1 a 3, 'skip' avrà valore 1
         cells[pos] = {'type': cell_type, 'value': value}
 
-    print("set special cells")
-    print("cells", cells)
-    print("PENALTY_CELLS", PENALTY_CELLS)
+    # Ritorna le celle generate
+    return cells
 
-    # Usa la route esistente per salvarle
-    return set_special_cells(info={'game_id': game_id, 'user_id': user_id, 'cells': cells})
+
 
 
 @app.route('/lista_games/<user_id>', methods=['GET'])
@@ -201,10 +191,13 @@ def create_game():
     num_cells = data['num_cells'] if 'num_cells' in list(data.keys()) != None else 5  # numero di caselle speciali da generare
     cells = data['cells'] if 'cells' in list(data.keys()) != None else None
     game_id = str(uuid.uuid4())
+
+    # Se le celle non sono fornite, generiamo celle casuali
     if cells:
-        set_special_cells(info={'game_id': game_id, 'user_id': user_id, 'cells': data['cells']})
+        special_cells = cells
     else:
-        generate_random_special_cells(info={'game_id': game_id, 'user_id': user_id, 'num_cells': num_cells})
+        special_cells = generate_random_special_cells(info={'game_id': game_id, 'user_id': user_id, 'num_cells': num_cells})
+
     try:
         with sqlite3.connect(DB) as conn:
             c = conn.cursor()
@@ -212,6 +205,7 @@ def create_game():
             c.execute("SELECT 1 FROM users WHERE id=?", (user_id,))
             if not c.fetchone():
                 return jsonify({'error': 'User not found'}), 404
+            
             # Creo la partita nel database
             c.execute('''
                     INSERT INTO games 
@@ -224,13 +218,14 @@ def create_game():
                     max_players,
                     max_cells,
                     1,           # Inizia con 1 giocatore
-                    json.dumps(PENALTY_CELLS)  # Salva le celle speciali come JSON
+                    json.dumps(special_cells)  # Salva le celle speciali come JSON
                 ))
             player_count = 1
-            # conn.execute("INSERT INTO games (id, status, current_turn, winner) VALUES (?, ?, ?, ?)",
-            #              (game_id, 'waiting', user_id, None))
+            
             conn.execute("INSERT INTO game_players (game_id, user_id, position, is_cpu) VALUES (?, ?, ?, ?)",
                         (game_id, user_id, 0, 0))
+            
+            # Se gioco vs CPU, aggiungi la CPU
             if vs_cpu:
                 cpu_id = str(uuid.uuid4())
                 conn.execute("INSERT INTO users (id, username, password) VALUES (?, ?, ?)",
@@ -238,23 +233,22 @@ def create_game():
                 conn.execute(
                     "INSERT INTO game_players (game_id, user_id, position, is_cpu) VALUES (?, ?, ?, ?)", (game_id, cpu_id, 0, 1))
 
-                
                 if player_count + 1 == max_players:
                     conn.execute(
                         "UPDATE games SET status = 'ongoing', player_count = ? WHERE id = ?", (player_count + 1, game_id,))
                 else:
                     conn.execute(
                         "UPDATE games SET player_count = ? WHERE id = ?", (player_count + 1, game_id,))
-                
+
         return jsonify({
-                    'message': 'Game created successfully',
-                    'game_id': game_id,
-                    'status': 'waiting',
-                    'max_players': max_players,
-                    'current_players': 1,
-                    'max_cells': max_cells,
-                    'special_cells': PENALTY_CELLS
-                }), 201
+            'message': 'Game created successfully',
+            'game_id': game_id,
+            'status': 'waiting',
+            'max_players': max_players,
+            'current_players': 1,
+            'max_cells': max_cells,
+            'special_cells': special_cells  # Invia le celle speciali generate
+        }), 201
     except sqlite3.Error as e:
         return jsonify({'error': 'Database error', 'details': str(e)}), 500
 
@@ -334,7 +328,8 @@ def roll_dice():
         finished = c.fetchone()
         if finished:
             return jsonify({'error': 'Game already finished'}), 400
-        # Check if game is waiting aggiunta flavio
+        
+        # Check if game is waiting
         c.execute("SELECT * FROM games WHERE id=? AND status='waiting'", (game_id,))
         waiting = c.fetchone()
         if waiting:
@@ -371,9 +366,23 @@ def roll_dice():
         conn.execute("UPDATE game_players SET position=? WHERE game_id=? AND user_id=?",
                      (new_pos, game_id, user_id))
 
-        # Check for penalty after move
-        if new_pos in PENALTY_CELLS:
-            penalty = PENALTY_CELLS[new_pos]
+        # Get special cells from the database
+        c.execute("SELECT special_cells FROM games WHERE id=?", (game_id,))
+        special_cells_json = c.fetchone()[0]
+
+        # If special_cells is None or empty, assign an empty dictionary
+        special_cells = {}
+        if special_cells_json:
+            try:
+                special_cells = json.loads(special_cells_json)
+                # Convert keys from strings to integers
+                special_cells = {int(key): value for key, value in special_cells.items()}
+            except json.JSONDecodeError:
+                return jsonify({'error': 'Error decoding special cells data'}), 500
+
+        # Check for penalty after move using special_cells
+        if new_pos in special_cells:
+            penalty = special_cells[new_pos]
             if penalty['type'] == 'back':
                 back_value = penalty['value']
                 back_pos = max(0, new_pos - back_value)
@@ -422,7 +431,6 @@ def roll_dice():
         'dice': dice,
         'new_position': new_pos
     })
-
 
 
 @app.route('/game_state/<game_id>', methods=['GET'])
