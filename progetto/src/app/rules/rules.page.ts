@@ -25,6 +25,7 @@ export class RulesPage {
   isFlippedLocanda   = false;
   isFlippedPrigione  = false;
   isFlippedMorte     = false;
+  isFlippedCacciatore = false;
 
   constructor(private router: Router, private cdr: ChangeDetectorRef) {
     addIcons({'flame-outline': flameOutline,

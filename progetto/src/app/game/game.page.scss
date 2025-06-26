@@ -89,6 +89,7 @@
   padding: 16px;
   background: #2b9348;
   flex-shrink: 0; // impedisce che venga compresso ma NON forza il 100%
+  margin-top: 10vh; /* Centra il tabellone verticalmente */
 }
 
 .grid {
@@ -247,7 +248,7 @@ ion-button {
   margin-top: 2vh;
   width: auto;
    z-index: 10;
-  position: relative;
+  position:relative;
 }
 .winner-banner {
   position: fixed;
@@ -281,7 +282,7 @@ ion-button {
     align-items: center;
     padding: 16px;
     background: #2b9348;
-    margin-top: 20vh; /* Centra il tabellone verticalmente */
+    margin-top: 10vh; /* Centra il tabellone verticalmente */
   }
 
   /* Icona di effetto speciale */
@@ -314,3 +315,7 @@ ion-button {
     border-radius: 8px;
   }
 }
+ .pippo{
+    text-align: center;
+  }
+  
