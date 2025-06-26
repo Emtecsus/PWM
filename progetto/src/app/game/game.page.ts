@@ -119,10 +119,6 @@ export class GamePage implements OnInit {
     }
   }
 
-  savePawnChoice() {
-    localStorage.setItem('pawn_' + this.userId, this.selectedPawn);
-  }
-
   getPawnImage(userId: string): string {
     // Recupera la pedina salvata nel localStorage per il giocatore corrente
     const savedPawn = localStorage.getItem('pawn_' + userId);
